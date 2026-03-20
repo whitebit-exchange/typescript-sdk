@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/cjs",
+    "rootDir": ".",
+    "module": "CommonJS",
+    "target": "ES2020",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "types": ["node"]
+  },
+  "include": ["*.ts", "api/**/*.ts", "auth/**/*.ts", "core/**/*.ts", "errors/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
