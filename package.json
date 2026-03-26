@@ -1,0 +1,35 @@
+{
+  "name": "whitebit-typescript-sdk",
+  "version": "1.0.3",
+  "description": "A TypeScript SDK for WhiteBit cryptocurrency exchange API",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/cjs/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json"
+  },
+  "keywords": ["whitebit", "cryptocurrency", "exchange", "api", "sdk", "trading", "typescript"],
+  "author": "WhiteBit SDK Team",
+  "license": "MIT",
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "node-fetch": "^2.7.0",
+    "qs": "6.11.2",
+    "readable-stream": "^4.5.2",
+    "js-base64": "^3.7.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

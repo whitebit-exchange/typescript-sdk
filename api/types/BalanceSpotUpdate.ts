@@ -13,6 +13,7 @@ export namespace BalanceSpotUpdate {
     export type Params = Params.Item[];
 
     export namespace Params {
+        export type Value = Item;
         export interface Item {
             /** Amount available for trade */
             available?: string | undefined;
