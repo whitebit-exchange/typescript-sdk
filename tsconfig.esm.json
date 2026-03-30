@@ -9,8 +9,19 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["*.ts", "api/**/*.ts", "auth/**/*.ts", "core/**/*.ts", "errors/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "*.ts",
+    "api/**/*.ts",
+    "auth/**/*.ts",
+    "core/**/*.ts",
+    "errors/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
