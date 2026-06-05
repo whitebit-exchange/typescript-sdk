@@ -10,6 +10,11 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/cjs/index.d.ts"
+    },
+    "./auth": {
+      "import": "./dist/esm/auth/index.js",
+      "require": "./dist/cjs/auth/index.js",
+      "types": "./dist/cjs/auth/index.d.ts"
     }
   },
   "files": [

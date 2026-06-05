@@ -41,13 +41,28 @@ npm install whitebit-typescript-sdk
 
 ### 2. Initialize the client
 
+**Public endpoints only** (market data, tickers, order book):
+
 ```ts
 import { WhitebitApiClient } from "whitebit-typescript-sdk";
 
+const client = new WhitebitApiClient({ txcApikey: "" });
+```
+
+**Private endpoints** (account, trading — requires HMAC signing):
+
+```ts
+import { WhitebitApiClient } from "whitebit-typescript-sdk";
+import { createHmacFetch } from "whitebit-typescript-sdk/auth";
+
 const client = new WhitebitApiClient({
   txcApikey: "YOUR_API_KEY",
-  token: "YOUR_TOKEN",
+  fetch: createHmacFetch("YOUR_API_SECRET"),
 });
+```
+
+> **Note:** WhiteBit private endpoints use HMAC-SHA512 signing (`X-TXC-PAYLOAD` + `X-TXC-SIGNATURE`).
+> `createHmacFetch` handles this automatically — no manual signing needed.
 ```
 
 ---
