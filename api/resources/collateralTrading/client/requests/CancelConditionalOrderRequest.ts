@@ -6,12 +6,14 @@
  *         market: "BTC_USDT",
  *         id: 117703764514,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CancelConditionalOrderRequest {
+    /** Market of the conditional order to cancel. Example: BTC_USDT */
     market: string;
+    /** Conditional order identifier. Obtain from the [query unexecuted conditional orders](/api-reference/collateral-trading/query-unexecuted-conditional-orders) endpoint. */
     id: number;
     request: string;
-    nonce: string;
+    nonce: number;
 }

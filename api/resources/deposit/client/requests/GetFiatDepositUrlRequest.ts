@@ -6,9 +6,9 @@
  *         ticker: "UAH",
  *         provider: "VISAMASTER",
  *         amount: "100",
- *         unique_id: "{{generateID}}",
+ *         uniqueId: "{{generateID}}",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -16,7 +16,7 @@
  *         ticker: "UAH",
  *         provider: "VISAMASTER",
  *         amount: "100",
- *         unique_id: "{{generateID}}",
+ *         uniqueId: "{{generateID}}",
  *         customer: {
  *             firstName: "John",
  *             lastName: "Doe",
@@ -29,7 +29,7 @@
  *             }
  *         },
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetFiatDepositUrlRequest {
@@ -39,8 +39,8 @@ export interface GetFiatDepositUrlRequest {
     provider: string;
     /** Deposit amount */
     amount: string;
-    /** Unique transaction identifier on client's side */
-    unique_id?: string;
+    /** Unique transaction identifier on client's side. Any string up to 255 characters; not validated as a UUID. */
+    uniqueId: string;
     /** Customer information (required for USD/EUR with VISAMASTER [provider](/glossary#provider)) */
     customer?: GetFiatDepositUrlRequest.Customer;
     /** Customer will be redirected to this URL by acquiring [provider](/glossary#provider) after success deposit. To activate this feature, please contact support */
@@ -52,7 +52,7 @@ export interface GetFiatDepositUrlRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }
 
 export namespace GetFiatDepositUrlRequest {

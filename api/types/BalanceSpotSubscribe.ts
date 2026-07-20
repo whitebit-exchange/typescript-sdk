@@ -4,7 +4,15 @@ export interface BalanceSpotSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `balanceSpot_subscribe`. */
-    method: "balanceSpot_subscribe";
+    method: BalanceSpotSubscribe.Method;
     /** Array of asset tickers to subscribe to */
     params: string[];
+}
+
+export namespace BalanceSpotSubscribe {
+    /** Method name. Fixed value: `balanceSpot_subscribe`. */
+    export const Method = {
+        BalanceSpotSubscribe: "balanceSpot_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

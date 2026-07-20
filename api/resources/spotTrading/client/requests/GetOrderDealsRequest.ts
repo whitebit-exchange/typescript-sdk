@@ -3,15 +3,18 @@
 /**
  * @example
  *     {
- *         order_id: 3134995325,
+ *         orderId: 3134995325,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetOrderDealsRequest {
-    order_id: number;
+    /** Identifier of the order to retrieve deals for. */
+    orderId: number;
+    /** Number of records to skip. Default: `0`. */
     offset?: number;
+    /** Maximum number of records to return. Default: `50`. */
     limit?: number;
     request: string;
-    nonce: string;
+    nonce: number;
 }

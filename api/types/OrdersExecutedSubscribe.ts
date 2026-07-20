@@ -4,11 +4,19 @@ export interface OrdersExecutedSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `ordersExecuted_subscribe`. */
-    method: "ordersExecuted_subscribe";
+    method: OrdersExecutedSubscribe.Method;
     /**
      * Subscription parameters tuple:
      * - [0] Array of market names
      * - [1] Filter (0=Limit and Market, 1=Limit, 2=Market)
      */
     params: unknown[];
+}
+
+export namespace OrdersExecutedSubscribe {
+    /** Method name. Fixed value: `ordersExecuted_subscribe`. */
+    export const Method = {
+        OrdersExecutedSubscribe: "ordersExecuted_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

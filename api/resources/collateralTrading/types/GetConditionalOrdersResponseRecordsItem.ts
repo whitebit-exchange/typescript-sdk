@@ -14,13 +14,15 @@ export namespace GetConditionalOrdersResponseRecordsItem {
     export interface Oco {
         type: "oco";
         id?: number | undefined;
-        stop_loss?: GetConditionalOrdersResponseRecordsItemOco.StopLoss | undefined;
-        take_profit?: GetConditionalOrdersResponseRecordsItemOco.TakeProfit | undefined;
+        /** Reduce-only flag */
+        reduceOnly?: boolean | undefined;
+        stopLoss?: GetConditionalOrdersResponseRecordsItemOco.StopLoss | undefined;
+        takeProfit?: GetConditionalOrdersResponseRecordsItemOco.TakeProfit | undefined;
     }
 
     export namespace GetConditionalOrdersResponseRecordsItemOco {
         export interface StopLoss {
-            order_id?: number | undefined;
+            orderId?: number | undefined;
             positionSide?: StopLoss.PositionSide | undefined;
         }
 
@@ -34,7 +36,7 @@ export namespace GetConditionalOrdersResponseRecordsItem {
         }
 
         export interface TakeProfit {
-            order_id?: number | undefined;
+            orderId?: number | undefined;
             positionSide?: TakeProfit.PositionSide | undefined;
         }
 
@@ -51,6 +53,8 @@ export namespace GetConditionalOrdersResponseRecordsItem {
     export interface Oto {
         type: "oto";
         id?: number | undefined;
+        /** Reduce-only flag */
+        reduceOnly?: boolean | undefined;
         stopLossPrice?: string | undefined;
         takeProfitPrice?: string | undefined;
         conditionalOrder?: GetConditionalOrdersResponseRecordsItemOto.ConditionalOrder | undefined;
@@ -58,8 +62,8 @@ export namespace GetConditionalOrdersResponseRecordsItem {
 
     export namespace GetConditionalOrdersResponseRecordsItemOto {
         export interface ConditionalOrder {
-            order_id?: number | undefined;
-            client_order_id?: string | undefined;
+            orderId?: number | undefined;
+            clientOrderId?: string | undefined;
             market?: string | undefined;
             positionSide?: ConditionalOrder.PositionSide | undefined;
         }

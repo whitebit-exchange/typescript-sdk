@@ -9,7 +9,7 @@
  *         offset: 0,
  *         status: [3, 7],
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetDepositWithdrawHistoryRequest {
@@ -25,7 +25,7 @@ export interface GetDepositWithdrawHistoryRequest {
     addresses?: string[];
     /** Can be used for filtering transactions by specific unique id */
     unique_id?: string;
-    /** LIMIT is a special clause used to limit records a particular query can return. */
+    /** LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 500 */
     limit?: number;
     /** Use the OFFSET clause to return entries starting from a particular line. */
     offset?: number;
@@ -38,5 +38,5 @@ export interface GetDepositWithdrawHistoryRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

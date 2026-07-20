@@ -4,6 +4,14 @@ export interface MarketTodayRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `marketToday_query`. */
-    method: "marketToday_query";
+    method: MarketTodayRequest.Method;
     params: unknown[];
+}
+
+export namespace MarketTodayRequest {
+    /** Method name. Fixed value: `marketToday_query`. */
+    export const Method = {
+        MarketTodayQuery: "marketToday_query",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

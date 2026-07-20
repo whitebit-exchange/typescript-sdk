@@ -10,10 +10,10 @@
 export interface CancelAllOrdersRequest {
     /** Available [market](/glossary#market). Example: BTC_USDT */
     market?: string;
-    /** Order types value. Example: 'spot', 'margin', 'futures' */
+    /** Order types to target. Valid values: "spot" — standard spot orders. "margin" — marginal orders placed on spot markets. Note: the "margin" value is not the same as the collateral account balance; "collateral" in other endpoints refers to the funding account, whereas "margin" here refers specifically to the order type. "futures" — marginal orders placed on futures markets (e.g., BTC_PERP). If omitted, the API targets all order types. */
     type?: CancelAllOrdersRequest.Type.Item[];
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }
 
 export namespace CancelAllOrdersRequest {

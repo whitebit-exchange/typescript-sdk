@@ -8,35 +8,38 @@
  *                 side: "buy",
  *                 amount: "0.02",
  *                 price: "40000",
- *                 client_order_id: "",
+ *                 clientOrderId: "",
  *                 postOnly: false,
  *                 ioc: false,
  *                 rpi: true,
- *                 positionSide: "LONG"
+ *                 positionSide: "LONG",
+ *                 reduceOnly: false
  *             }, {
  *                 market: "BTC_USDT",
  *                 side: "sell",
  *                 amount: "0.0001",
  *                 price: "41000",
- *                 client_order_id: "",
+ *                 clientOrderId: "",
  *                 postOnly: false,
  *                 ioc: false,
  *                 rpi: true,
- *                 positionSide: "LONG"
+ *                 positionSide: "LONG",
+ *                 reduceOnly: true
  *             }, {
  *                 market: "ETH_BTC",
  *                 side: "sell",
  *                 amount: "0.02",
  *                 price: "0.030",
- *                 client_order_id: "",
+ *                 clientOrderId: "",
  *                 postOnly: false,
  *                 ioc: false,
  *                 rpi: true,
- *                 positionSide: "LONG"
+ *                 positionSide: "LONG",
+ *                 reduceOnly: false
  *             }],
  *         stopOnFail: true,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CreateCollateralBulkOrderRequest {
@@ -50,7 +53,7 @@ export interface CreateCollateralBulkOrderRequest {
      */
     stopOnFail?: boolean;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }
 
 export namespace CreateCollateralBulkOrderRequest {
@@ -62,12 +65,12 @@ export namespace CreateCollateralBulkOrderRequest {
             market?: string | undefined;
             /** Order type. Variables: 'buy' / 'sell'. */
             side?: Item.Side | undefined;
-            /** Amount of [stock](/glossary#stock) currency to buy or sell. */
+            /** Amount of [stock](/glossary#stock) currency to buy or sell. Minimum and step values are market-dependent — query the [market info](/api-reference/market-data/market-info) endpoint for constraints. */
             amount?: string | undefined;
-            /** Price in [money](/glossary#money) currency. */
+            /** Limit order price in [money](/glossary#money) currency. Minimum price step is market-dependent. */
             price?: string | undefined;
-            /** Identifier must be unique and contain letters, numbers, dashes, dots, or underscores. */
-            client_order_id?: string | undefined;
+            /** Custom client order identifier. Uniqueness is enforced only among the account's open (pending) orders on the same market — once a previous order is filled or canceled, the same identifier can be reused, including on the same market. Contains only letters, numbers, dashes, dots, or underscores. */
+            clientOrderId?: string | undefined;
             /**
              * Stop loss price.
              *
@@ -80,24 +83,31 @@ export namespace CreateCollateralBulkOrderRequest {
              * When provided, the system creates an [OTO](/glossary#one-triggers-the-other-oto) order with a take profit condition.
              */
             takeProfit?: string | undefined;
-            /** Ensures the order adds liquidity and executes as maker. */
+            /** Ensures the order adds liquidity and executes as maker. Default: `false`. */
             postOnly?: boolean | undefined;
             /**
-             * Immediate-or-cancel (IOC) executes all or part of an order immediately and cancels any unfilled portion.
+             * Immediate-or-cancel (IOC) executes all or part of an order immediately and cancels any unfilled portion. Default: `false`.
              *
              * IOC does not support `rpi=true` because RPI uses post-only behavior by design.
-             * The API returns error code `37` when an order item sets both `ioc=true` and `rpi=true`.
+             * The API returns error code `40` when an order item sets both `ioc=true` and `rpi=true`.
              */
             ioc?: boolean | undefined;
             /**
-             * Enables Retail Price Improvement (RPI) mode.
+             * Enables Retail Price Improvement (RPI) mode. Default: `false`.
              *
              * RPI orders use post-only behavior by design. An RPI order does not support `ioc=true`.
-             * The API returns error code `37` when an order item sets both `rpi=true` and `ioc=true`.
+             * The API returns error code `40` when an order item sets both `rpi=true` and `ioc=true`.
              */
             rpi?: boolean | undefined;
-            /** Defines the position direction when hedge mode is enabled. See [positionSide](/glossary#position-side) */
+            /**
+             * Position direction. Optional at the request layer but functionally required when hedge mode is enabled. See [positionSide](/glossary#position-side).
+             *
+             * - **One-way mode** (default account mode): the field is ignored. Orders always use `BOTH`, and the response returns `positionSide: "BOTH"` whether the field is sent or omitted.
+             * - **Hedge mode**: the field MUST be `LONG` or `SHORT`. Sending `BOTH`, omitting the field, or sending a value that does not match the account's mode causes the trade service to reject the per-order item with error code `114` (`Hedge mode position side does not match`).
+             */
             positionSide?: Item.PositionSide | undefined;
+            /** When `true`, the order can only reduce or close an existing position — the order cannot increase the position or open a new one. If the order amount exceeds the current position size, the system reduces the order to match — the response returns the adjusted amount. Cannot be combined with `stopLoss` or `takeProfit`. The API returns error code `116` if no open position exists or the order side matches the position direction. See [reduce-only](/glossary#reduce-only). */
+            reduceOnly?: boolean | undefined;
         }
 
         export namespace Item {
@@ -107,7 +117,12 @@ export namespace CreateCollateralBulkOrderRequest {
                 Sell: "sell",
             } as const;
             export type Side = (typeof Side)[keyof typeof Side];
-            /** Defines the position direction when hedge mode is enabled. See [positionSide](/glossary#position-side) */
+            /**
+             * Position direction. Optional at the request layer but functionally required when hedge mode is enabled. See [positionSide](/glossary#position-side).
+             *
+             * - **One-way mode** (default account mode): the field is ignored. Orders always use `BOTH`, and the response returns `positionSide: "BOTH"` whether the field is sent or omitted.
+             * - **Hedge mode**: the field MUST be `LONG` or `SHORT`. Sending `BOTH`, omitting the field, or sending a value that does not match the account's mode causes the trade service to reject the per-order item with error code `114` (`Hedge mode position side does not match`).
+             */
             export const PositionSide = {
                 Long: "LONG",
                 Short: "SHORT",

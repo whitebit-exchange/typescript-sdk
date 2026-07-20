@@ -6,12 +6,22 @@
  *         market: "BTC_USDT",
  *         positionId: 1,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetPositionsHistoryRequest {
+    /**
+     * Filter by specific market. Example: BTC_USDT
+     *
+     * If not specified, returns position history for all markets.
+     */
     market?: string;
+    /** Filter by specific position identifier. If not specified, returns history for all positions. */
     positionId?: number;
+    /** Start of the query window as a Unix timestamp in seconds. Optional, no default. Must be ≤ `endDate`. */
+    startDate?: number;
+    /** End of the query window as a Unix timestamp in seconds. Optional, no default. Must be ≥ `startDate` and ≤ `now + 1s`; violating values are rejected with a validation error. */
+    endDate?: number;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

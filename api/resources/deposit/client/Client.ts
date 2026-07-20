@@ -28,6 +28,12 @@ export class DepositClient {
     /**
      * The endpoint retrieves a deposit address of the cryptocurrency.
      *
+     * <Note>
+     * Sub-accounts use this endpoint with their own API key once deposits are enabled for the
+     * account. Crypto deposits are disabled by default — to enable them, contact your assigned
+     * Account Manager or email institutional@whitebit.com.
+     * </Note>
+     *
      * <Accordion title="Errors">
      * ```json
      * {
@@ -78,7 +84,7 @@ export class DepositClient {
      *     await client.deposit.getDepositAddress({
      *         ticker: "BTC",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public getDepositAddress(
@@ -96,7 +102,10 @@ export class DepositClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -244,8 +253,78 @@ export class DepositClient {
      *   "code": 0,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "successLink": ["Uri domain must have only https scheme"],
-     *     "failureLink": ["Uri domain must have only https scheme"]
+     *     "successLink": ["Your domain scheme incorrect. Use https only"],
+     *     "failureLink": ["Your domain scheme incorrect. Use https only"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "ticker": ["Currency is not depositable via API"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "user": ["User not verified"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "amount": ["Amount is too big for deposit"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "amount": ["Daily limit reached"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "amount": ["Expiration date cannot be used for this provider"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "customer.birthDate": ["You must be at least 18 years old"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 0,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "address": ["Invalid credit card number"]
      *   }
      * }
      * ```
@@ -274,9 +353,9 @@ export class DepositClient {
      *         ticker: "UAH",
      *         provider: "VISAMASTER",
      *         amount: "100",
-     *         unique_id: "{{generateID}}",
+     *         uniqueId: "{{generateID}}",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -284,7 +363,7 @@ export class DepositClient {
      *         ticker: "UAH",
      *         provider: "VISAMASTER",
      *         amount: "100",
-     *         unique_id: "{{generateID}}",
+     *         uniqueId: "{{generateID}}",
      *         customer: {
      *             firstName: "John",
      *             lastName: "Doe",
@@ -297,7 +376,7 @@ export class DepositClient {
      *             }
      *         },
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public getFiatDepositUrl(
@@ -315,7 +394,10 @@ export class DepositClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -415,7 +497,10 @@ export class DepositClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -512,10 +597,10 @@ export class DepositClient {
      *
      * @example
      *     await client.deposit.refundDeposit({
-     *         transaction_id: "54bffeb7-7a8f-43f8-bcd8-f14ec10fee85",
+     *         transactionId: "54bffeb7-7a8f-43f8-bcd8-f14ec10fee85",
      *         address: "0x1234567890abcdef1234567890abcdef12345678",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public refundDeposit(
@@ -533,7 +618,10 @@ export class DepositClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -585,6 +673,11 @@ export class DepositClient {
     /**
      * The endpoint creates a new address even when the last created address is not used. The endpoint is not available by default, contact support@whitebit.com to get permissions to use the endpoint.
      *
+     * <Note>
+     * For sub-accounts, crypto deposits must also be enabled for the account (disabled by
+     * default). To enable them, contact your assigned Account Manager or email institutional@whitebit.com.
+     * </Note>
+     *
      * **Address types:**
      *
      * | Currency | Types               | Default |
@@ -610,7 +703,7 @@ export class DepositClient {
      *     await client.deposit.createNewAddress({
      *         ticker: "XLM",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -618,7 +711,7 @@ export class DepositClient {
      *         ticker: "USDT",
      *         network: "ERC20",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -626,7 +719,7 @@ export class DepositClient {
      *         ticker: "BTC",
      *         type: "bech32",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createNewAddress(
@@ -644,7 +737,10 @@ export class DepositClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({

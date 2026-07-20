@@ -6,9 +6,9 @@
  *         ticker: "ETH",
  *         amount: "0.9",
  *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
- *         unique_id: "24529041",
+ *         uniqueId: "24529041",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -16,10 +16,10 @@
  *         ticker: "USDT",
  *         amount: "0.9",
  *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
- *         unique_id: "24529042",
+ *         uniqueId: "24529042",
  *         network: "ERC20",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -27,10 +27,22 @@
  *         ticker: "UAH",
  *         amount: "100",
  *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
- *         unique_id: "24529043",
+ *         uniqueId: "24529043",
  *         provider: "VISAMASTER",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
+ *     }
+ *
+ * @example
+ *     {
+ *         ticker: "USD",
+ *         amount: "150.00",
+ *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
+ *         uniqueId: "ab12cd34-9101-4abc-9def-1234567890ab",
+ *         provider: "VISAMASTER",
+ *         customerIp: "203.0.113.42",
+ *         request: "{{request}}",
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -38,11 +50,11 @@
  *         ticker: "UAH",
  *         amount: "50000",
  *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
- *         unique_id: "24529045",
+ *         uniqueId: "24529045",
  *         provider: "VISAMASTER_PAYCORE",
  *         partialEnable: true,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -50,7 +62,7 @@
  *         ticker: "UAH",
  *         amount: "50000",
  *         address: "UA213223130000026007233566001",
- *         unique_id: "24529045",
+ *         uniqueId: "24529045",
  *         provider: "UAH_IBAN",
  *         beneficiary: {
  *             firstName: "Firstname",
@@ -58,7 +70,7 @@
  *             tin: 1000000000
  *         },
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -66,7 +78,7 @@
  *         ticker: "USD",
  *         amount: "30000",
  *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
- *         unique_id: "24529045",
+ *         uniqueId: "24529045",
  *         provider: "USD_VISAMASTER",
  *         beneficiary: {
  *             firstName: "Firstname",
@@ -75,7 +87,7 @@
  *             email: "john_doe@email.com"
  *         },
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -83,31 +95,98 @@
  *         ticker: "BTC",
  *         amount: "0.5",
  *         address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
- *         unique_id: "24529046",
+ *         uniqueId: "24529048",
  *         travelRule: {
- *             type: "individual",
- *             vasp: "Binance",
- *             name: "John",
- *             address: "123 Business Street, London, UK"
+ *             walletType: "hosted",
+ *             beneficiary: {
+ *                 type: "individual",
+ *                 firstName: "John",
+ *                 lastName: "Doe",
+ *                 residenceCountry: "DEU",
+ *                 address: {
+ *                     country: "DEU",
+ *                     city: "Berlin",
+ *                     addressLine1: "Alexanderplatz 1"
+ *                 }
+ *             },
+ *             vaspData: {
+ *                 vaspId: "vasp-001"
+ *             }
  *         },
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
+ *     }
+ *
+ * @example
+ *     {
+ *         ticker: "USDT",
+ *         amount: "10000",
+ *         address: "0x742d35Cc6634C0532925a3b844Bc9e7595f8a2B1",
+ *         uniqueId: "24529049",
+ *         network: "ERC20",
+ *         travelRule: {
+ *             walletType: "hosted",
+ *             beneficiary: {
+ *                 type: "entity",
+ *                 fullName: "Acme Trading Ltd",
+ *                 residenceCountry: "GBR",
+ *                 address: {
+ *                     country: "GBR",
+ *                     city: "London",
+ *                     postCode: "EC2A 4BX",
+ *                     addressLine1: "123 Finsbury Square"
+ *                 }
+ *             },
+ *             vaspData: {
+ *                 vaspName: "Famous Vasp Inc"
+ *             }
+ *         },
+ *         request: "{{request}}",
+ *         nonce: 1594297865000
+ *     }
+ *
+ * @example
+ *     {
+ *         ticker: "ETH",
+ *         amount: "2.5",
+ *         address: "0xabcdef1234567890abcdef1234567890abcdef12",
+ *         uniqueId: "24529050",
+ *         travelRule: {
+ *             walletType: "unhosted",
+ *             beneficiary: {
+ *                 type: "individual",
+ *                 firstName: "Jane",
+ *                 lastName: "Smith",
+ *                 residenceCountry: "NLD",
+ *                 address: {
+ *                     country: "NLD",
+ *                     city: "Amsterdam",
+ *                     addressLine1: "Damrak 1"
+ *                 }
+ *             }
+ *         },
+ *         request: "{{request}}",
+ *         nonce: 1594297865000
  *     }
  *
  * @example
  *     {
  *         ticker: "BTC",
- *         amount: "1.2",
+ *         amount: "0.5",
  *         address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
- *         unique_id: "24529047",
- *         travelRule: {
- *             type: "entity",
- *             vasp: "Kraken",
- *             name: "Acme Corp",
- *             address: "123 Business Street, London, UK"
- *         },
+ *         uniqueId: "24529051",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
+ *     }
+ *
+ * @example
+ *     {
+ *         ticker: "BTC",
+ *         amount: "1.0",
+ *         address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+ *         uniqueId: "24529052",
+ *         request: "{{request}}",
+ *         nonce: 1594297865000
  *     }
  */
 export interface CreateWithdrawRequest {
@@ -128,11 +207,11 @@ export interface CreateWithdrawRequest {
      */
     memo?: string;
     /**
-     * Unique transaction identifier.
+     * Unique transaction identifier. Any string up to 255 characters; not validated as a UUID.
      *
      * ⚠️ Generate a new unique ID for each withdrawal request.
      */
-    unique_id?: string;
+    uniqueId: string;
     /**
      * [Fiat](/glossary#fiat) currency [provider](/glossary#provider). Example: VISAMASTER
      *
@@ -148,15 +227,27 @@ export interface CreateWithdrawRequest {
     /** Optional parameter for [FIAT](/glossary#fiat) withdrawals with increased Maximum Limit if set as "true". To use this parameter, the application must support "Partially successful" withdrawal status and latest updates in deposit/withdrawal history. */
     partialEnable?: boolean;
     /**
-     * Beneficiary information data array.
+     * End-customer IP address forwarded to the [fiat](/glossary#fiat) [provider](/glossary#provider) for antifraud checks before the withdrawal is processed.
      *
-     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR
+     * ⚠️ Required if currency [ticker](/glossary#ticker) is USD or EUR with VISAMASTER [provider](/glossary#provider).
+     */
+    customerIp?: string;
+    /**
+     * Beneficiary information.
+     *
+     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR.
+     *
+     * Per-field requirements vary by currency and provider. Card-related fields (`cardToken`, `card.*`, `cardTokenSave`, `fingerprintSession`) apply only to card-acquiring rails; bank-related fields (`bank.*`) apply to bank-rail withdrawals; `tin` is required for UAH_IBAN; `phone`, `email`, and `birthDate` are required for VISAMASTER/Mercuryo rails. See `/asset-status-list` for the active provider per currency.
      */
     beneficiary?: CreateWithdrawRequest.Beneficiary;
     /**
-     * Travel Rule information data array.
+     * Travel Rule information for regulatory compliance.
      *
      * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
+     *
+     * See [Travel Rule Overview](/api-reference/travel-rule/overview) for complete documentation.
+     *
+     * **Legacy format:** The API still accepts the old flat format (`type`, `vasp`, `name`, `address` fields), but this format will not pass Travel Rule verification. To complete Travel Rule compliance, use the new structured format with `walletType`, `beneficiary`, and `vasp` objects.
      */
     travelRule?: CreateWithdrawRequest.TravelRule;
     /**
@@ -168,14 +259,16 @@ export interface CreateWithdrawRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }
 
 export namespace CreateWithdrawRequest {
     /**
-     * Beneficiary information data array.
+     * Beneficiary information.
      *
-     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR
+     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR.
+     *
+     * Per-field requirements vary by currency and provider. Card-related fields (`cardToken`, `card.*`, `cardTokenSave`, `fingerprintSession`) apply only to card-acquiring rails; bank-related fields (`bank.*`) apply to bank-rail withdrawals; `tin` is required for UAH_IBAN; `phone`, `email`, and `birthDate` are required for VISAMASTER/Mercuryo rails. See `/asset-status-list` for the active provider per currency.
      */
     export interface Beneficiary {
         /**
@@ -211,53 +304,174 @@ export namespace CreateWithdrawRequest {
         /**
          * Beneficiary birth date. Format: YYYY-MM-DD.
          *
-         * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, EUR_VISAMASTER
+         * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, EUR_VISAMASTER, or when withdrawing through Mercuryo.
          */
         birthDate?: string | undefined;
+        /** Beneficiary verification code returned by a prior verification step. Used by some card-acquiring flows that require a one-time verification challenge before settlement. */
+        code?: string | undefined;
+        /** Tokenized payment-card identifier for card-acquiring rails. Use instead of raw PAN; obtain from the card-tokenisation endpoint or from a prior successful settlement on the same card. */
+        cardToken?: string | undefined;
+        /** If `true`, request the acquiring provider to persist the card token for reuse on subsequent withdrawals to the same beneficiary. */
+        cardTokenSave?: boolean | undefined;
+        /** Anti-fraud device-fingerprint session identifier captured at the partner's checkout surface and forwarded to the acquiring provider. Required by some VISAMASTER configurations. */
+        fingerprintSession?: string | undefined;
+        /** Card details for card-acquiring rails. Use `cardToken` instead when available; raw card details apply only when a fresh card is being added. */
+        card?: Beneficiary.Card | undefined;
+        /** Beneficiary postal address. Required for several VISAMASTER/SEPA configurations. */
+        address?: Beneficiary.Address | undefined;
+        /** Beneficiary bank details for bank-rail withdrawals (used when the destination is an account number rather than an IBAN). */
+        bank?: Beneficiary.Bank | undefined;
+    }
+
+    export namespace Beneficiary {
+        /**
+         * Card details for card-acquiring rails. Use `cardToken` instead when available; raw card details apply only when a fresh card is being added.
+         */
+        export interface Card {
+            /** If `true`, persist the card for reuse on subsequent withdrawals. */
+            save?: boolean | undefined;
+            /** Cardholder name as embossed on the card. */
+            name?: string | undefined;
+            /** Cardholder first name. */
+            firstName?: string | undefined;
+            /** Cardholder last name. */
+            lastName?: string | undefined;
+            /** Primary Account Number (PAN). Treat as PCI-scope sensitive data on the partner side. */
+            number?: string | undefined;
+            /** Card expiry month as a two-digit string (`01`-`12`). */
+            month?: string | undefined;
+            /** Card expiry year as a four-digit string. */
+            year?: string | undefined;
+        }
+
+        /**
+         * Beneficiary postal address. Required for several VISAMASTER/SEPA configurations.
+         */
+        export interface Address {
+            /** Street address line 1. */
+            line1?: string | undefined;
+            /** Street address line 2. */
+            line2?: string | undefined;
+            /** City. */
+            city?: string | undefined;
+            /** Postal / ZIP code. */
+            zip?: string | undefined;
+            /** ISO country code. */
+            country?: string | undefined;
+        }
+
+        /**
+         * Beneficiary bank details for bank-rail withdrawals (used when the destination is an account number rather than an IBAN).
+         */
+        export interface Bank {
+            /** Bank routing number (ABA, BSB, sort code, or equivalent for the destination country). */
+            routingNumber?: string | undefined;
+            /** Bank name. */
+            name?: string | undefined;
+            /** Bank postal address. */
+            address?: string | undefined;
+            /** Bank country (ISO code). */
+            country?: string | undefined;
+        }
     }
 
     /**
-     * Travel Rule information data array.
+     * Travel Rule information for regulatory compliance.
      *
      * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
+     *
+     * See [Travel Rule Overview](/api-reference/travel-rule/overview) for complete documentation.
+     *
+     * **Legacy format:** The API still accepts the old flat format (`type`, `vasp`, `name`, `address` fields), but this format will not pass Travel Rule verification. To complete Travel Rule compliance, use the new structured format with `walletType`, `beneficiary`, and `vasp` objects.
      */
     export interface TravelRule {
         /**
-         * Travel rule receiver type. Values: "individual" or "entity"
-         *
-         * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
+         * Destination wallet type:
+         * - `hosted` - VASP-hosted wallet (exchange, custodian). Requires `vasp` object.
+         * - `unhosted` - Self-custody wallet (hardware, software). No `vasp` required.
          */
-        type?: TravelRule.Type | undefined;
+        walletType?: TravelRule.WalletType | undefined;
+        /** Beneficiary information. */
+        beneficiary?: TravelRule.Beneficiary | undefined;
         /**
-         * Travel rule destination platform (VASP) name.
+         * VASP (Virtual Asset Service Provider) information. Required if `walletType` is `hosted`.
          *
-         * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
+         * Use `vaspId` if the destination VASP is in the list from [Get VASPs](/api-reference/travel-rule/get-vasps), otherwise use `vaspName`.
          */
-        vasp?: string | undefined;
-        /**
-         * Travel rule. If individual - first_name ; if entity - entity_name
-         *
-         * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
-         */
-        name?: string | undefined;
-        /**
-         * Travel rule. If individual - last_name ; if entity - entity_address
-         *
-         * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
-         */
-        address?: string | undefined;
+        vaspData?: TravelRule.VaspData | undefined;
     }
 
     export namespace TravelRule {
         /**
-         * Travel rule receiver type. Values: "individual" or "entity"
-         *
-         * ⚠️ Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea)
+         * Destination wallet type:
+         * - `hosted` - VASP-hosted wallet (exchange, custodian). Requires `vasp` object.
+         * - `unhosted` - Self-custody wallet (hardware, software). No `vasp` required.
          */
-        export const Type = {
-            Individual: "individual",
-            Entity: "entity",
+        export const WalletType = {
+            Hosted: "hosted",
+            Unhosted: "unhosted",
         } as const;
-        export type Type = (typeof Type)[keyof typeof Type];
+        export type WalletType = (typeof WalletType)[keyof typeof WalletType];
+
+        /**
+         * Beneficiary information.
+         */
+        export interface Beneficiary {
+            /**
+             * Beneficiary type:
+             * - `individual` - Natural person. Requires `firstName`, `lastName`.
+             * - `entity` - Legal entity. Requires `fullName`.
+             */
+            type?: Beneficiary.Type | undefined;
+            /** First name. Required if `type` is `individual`. */
+            firstName?: string | undefined;
+            /** Last name. Required if `type` is `individual`. */
+            lastName?: string | undefined;
+            /** Full legal name. Required if `type` is `entity`. */
+            fullName?: string | undefined;
+            /** Beneficiary's country of residence. ISO 3166-1 alpha-3 code (3 letters). */
+            residenceCountry?: string | undefined;
+            /** Physical address. */
+            address?: Beneficiary.Address | undefined;
+        }
+
+        export namespace Beneficiary {
+            /**
+             * Beneficiary type:
+             * - `individual` - Natural person. Requires `firstName`, `lastName`.
+             * - `entity` - Legal entity. Requires `fullName`.
+             */
+            export const Type = {
+                Individual: "individual",
+                Entity: "entity",
+            } as const;
+            export type Type = (typeof Type)[keyof typeof Type];
+
+            /**
+             * Physical address.
+             */
+            export interface Address {
+                /** ISO 3166-1 alpha-3 country code. */
+                country?: string | undefined;
+                /** City name. */
+                city?: string | undefined;
+                /** Postal code. */
+                postCode?: string | undefined;
+                /** Street address. */
+                addressLine1?: string | undefined;
+            }
+        }
+
+        /**
+         * VASP (Virtual Asset Service Provider) information. Required if `walletType` is `hosted`.
+         *
+         * Use `vaspId` if the destination VASP is in the list from [Get VASPs](/api-reference/travel-rule/get-vasps), otherwise use `vaspName`.
+         */
+        export interface VaspData {
+            /** VASP ID from the [Get VASPs](/api-reference/travel-rule/get-vasps) endpoint. Use this if the VASP is in the list. */
+            vaspId?: string | undefined;
+            /** VASP name as a string. Use this if the VASP is not in the list. */
+            vaspName?: string | undefined;
+        }
     }
 }

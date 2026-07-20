@@ -4,7 +4,15 @@ export interface DealsSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `deals_subscribe`. */
-    method: "deals_subscribe";
+    method: DealsSubscribe.Method;
     /** Array containing array of markets */
     params: string[][];
+}
+
+export namespace DealsSubscribe {
+    /** Method name. Fixed value: `deals_subscribe`. */
+    export const Method = {
+        DealsSubscribe: "deals_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

@@ -6,9 +6,9 @@
  *         ticker: "ETH",
  *         amount: "0.9",
  *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
- *         unique_id: "24529041",
+ *         uniqueId: "24529041",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface WithdrawRequest {
@@ -20,14 +20,16 @@ export interface WithdrawRequest {
     address: string;
     /** Required if currency is memoable. See [memo](/glossary#memodestination-tag) for details. */
     memo?: string;
-    /** Unique transaction identifier. ⚠️ Generate a new unique ID for each withdrawal request. */
-    unique_id?: string;
+    /** Unique transaction identifier. Any string up to 255 characters; not validated as a UUID. ⚠️ Generate a new unique ID for each withdrawal request. */
+    uniqueId: string;
     /** [Fiat](/glossary#fiat) currency [provider](/glossary#provider). Example: VISAMASTER ⚠️ Currency provider should be taken from [Asset Status endpoint](/public/http-v4/asset-status-list) response. Required if currency is fiat. */
     provider?: string;
     /** Cryptocurrency network. Available for [multinetwork](/glossary#multinetwork) currencies. Example: OMNI ⚠️ Currency network should be taken from [Asset Status endpoint](/public/http-v4/asset-status-list) response. Default for USDT is ERC20 */
     network?: string;
     /** Optional parameter for [FIAT](/glossary#fiat) withdrawals with increased Maximum Limit if set as "true". To use this parameter, the application must support "Partially successful" withdrawal status and latest updates in deposit/withdrawal history. */
     partialEnable?: boolean;
+    /** End-customer IP address forwarded to the [fiat](/glossary#fiat) [provider](/glossary#provider) for antifraud checks before the withdrawal is processed. ⚠️ Required if currency [ticker](/glossary#ticker) is USD or EUR with VISAMASTER [provider](/glossary#provider). */
+    customerIp?: string;
     /** Beneficiary information data. Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR */
     beneficiary?: Record<string, unknown>;
     /** Travel Rule information data. Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea) */
@@ -35,5 +37,5 @@ export interface WithdrawRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

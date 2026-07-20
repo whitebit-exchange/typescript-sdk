@@ -3,7 +3,7 @@
 export interface DepthSubscribe {
     id: number;
     /** Method name. Fixed value: `depth_subscribe`. */
-    method: "depth_subscribe";
+    method: DepthSubscribe.Method;
     /**
      * Subscription parameters:
      * - [0] Market name
@@ -12,4 +12,12 @@ export interface DepthSubscribe {
      * - [3] Multiple subscription flag (true=add, false=unsubscribe all)
      */
     params: unknown[];
+}
+
+export namespace DepthSubscribe {
+    /** Method name. Fixed value: `depth_subscribe`. */
+    export const Method = {
+        DepthSubscribe: "depth_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

@@ -4,7 +4,15 @@ export interface BalanceMarginSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `balanceMargin_subscribe`. */
-    method: "balanceMargin_subscribe";
+    method: BalanceMarginSubscribe.Method;
     /** Array of asset tickers to subscribe to */
     params: string[];
+}
+
+export namespace BalanceMarginSubscribe {
+    /** Method name. Fixed value: `balanceMargin_subscribe`. */
+    export const Method = {
+        BalanceMarginSubscribe: "balanceMargin_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

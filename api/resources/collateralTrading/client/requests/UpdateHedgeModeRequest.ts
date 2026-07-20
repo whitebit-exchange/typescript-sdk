@@ -5,11 +5,12 @@
  *     {
  *         hedgeMode: true,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface UpdateHedgeModeRequest {
+    /** Set to `true` to enable hedge mode (simultaneous long and short positions) or `false` to use one-way mode. */
     hedgeMode: boolean;
     request: string;
-    nonce: string;
+    nonce: number;
 }

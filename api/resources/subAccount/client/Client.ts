@@ -34,6 +34,15 @@ export class SubAccountClient {
      * - When `shareKyc` is `true`: `email` is **optional**
      * </Note>
      *
+     * <Note>
+     * Crypto deposits are disabled by default. Once deposits are enabled for the account, the
+     * capability applies to the account and its sub-accounts; enablement is not available via
+     * API. To request it, contact your assigned Account Manager or email institutional@whitebit.com.
+     * Once enabled, a sub-account generates deposit addresses through the standard
+     * [deposit-address endpoint](/api-reference/account-wallet/get-cryptocurrency-deposit-address)
+     * using its own API key with deposit permission.
+     * </Note>
+     *
      * <Warning>
      * Rate limit: 1000 requests/10 sec.
      * </Warning>
@@ -71,7 +80,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -151,7 +163,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -236,7 +251,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -314,7 +332,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -397,7 +418,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -480,7 +504,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -560,7 +587,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -641,7 +671,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -702,6 +735,14 @@ export class SubAccountClient {
      * The API does not cache the response.
      * </Note>
      *
+     * <Note>
+     * Results are sorted by transaction id descending (newest transfer first). The response is a plain array with no `total`, `has_more`, or cursor — a returned count below `limit` marks the last page (an empty array means no further records).
+     * </Note>
+     *
+     * <Note>
+     * **No date filtering:** the endpoint does not accept `startDate` / `endDate` parameters, and pagination is capped at `offset + limit ≤ 10000` (`limit` ≤ 100). The required `id` parameter already scopes results to a single sub-account; for a complete history export beyond the cap, use the Report on the History page.
+     * </Note>
+     *
      * @param {WhitebitApi.GetSubAccountTransferHistoryRequest} request
      * @param {SubAccountClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -727,7 +768,10 @@ export class SubAccountClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -780,5 +824,318 @@ export class SubAccountClient {
             "POST",
             "/api/v4/sub-account/transfer/history",
         );
+    }
+
+    /**
+     * The endpoint returns a paginated list of withdrawal transactions in `unconfirmed_by_main_account` status,
+     * created by [sub-accounts](/glossary#sub-account) of the authenticated main account and awaiting main account confirmation.
+     * Results are ordered by creation time, newest first.
+     *
+     * <Note>
+     * The sub-account withdrawal endpoints are not available by default. To request access, contact institutional@whitebit.com.
+     * A `404 Not Found` response indicates the endpoint is not enabled for the account.
+     * </Note>
+     *
+     * <Note>
+     * The sub-account feature must be enabled for the region.
+     * </Note>
+     *
+     * @param {WhitebitApi.ListUnconfirmedSubAccountWithdrawalsRequest} request
+     * @param {SubAccountClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.UnauthorizedError}
+     * @throws {@link WhitebitApi.NotFoundError}
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     *
+     * @example
+     *     await client.subAccount.listUnconfirmedSubAccountWithdrawals({
+     *         limit: 100,
+     *         offset: 0
+     *     })
+     */
+    public listUnconfirmedSubAccountWithdrawals(
+        request: WhitebitApi.ListUnconfirmedSubAccountWithdrawalsRequest = {},
+        requestOptions?: SubAccountClient.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.ListUnconfirmedSubAccountWithdrawalsResponse> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__listUnconfirmedSubAccountWithdrawals(request, requestOptions),
+        );
+    }
+
+    private async __listUnconfirmedSubAccountWithdrawals(
+        request: WhitebitApi.ListUnconfirmedSubAccountWithdrawalsRequest = {},
+        requestOptions?: SubAccountClient.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.ListUnconfirmedSubAccountWithdrawalsResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/sub-account/withdraw/unconfirmed-list",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as WhitebitApi.ListUnconfirmedSubAccountWithdrawalsResponse,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new WhitebitApi.UnauthorizedError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/api/v4/sub-account/withdraw/unconfirmed-list",
+        );
+    }
+
+    /**
+     * The endpoint confirms a single withdrawal transaction created by a [sub-account](/glossary#sub-account)
+     * of the authenticated main account. Confirmation is the main account action that approves a withdrawal
+     * held in `unconfirmed_by_main_account` status and releases it for processing.
+     *
+     * Identify the target transaction by its external id, obtained from
+     * [List Unconfirmed Sub-Account Withdrawals](/api-reference/sub-accounts/list-unconfirmed-sub-account-withdrawals).
+     * Confirmation is the only main account action on an unconfirmed withdrawal; a withdrawal left unconfirmed
+     * expires after a retention period. A successful call returns an empty object.
+     *
+     * <Note>
+     * The sub-account withdrawal endpoints are not available by default. To request access, contact institutional@whitebit.com.
+     * A `404 Not Found` response indicates the endpoint is not enabled for the account.
+     * </Note>
+     *
+     * <Note>
+     * The sub-account feature must be enabled for the region.
+     * </Note>
+     *
+     * @param {WhitebitApi.ConfirmSubAccountWithdrawalRequest} request
+     * @param {SubAccountClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.UnauthorizedError}
+     * @throws {@link WhitebitApi.NotFoundError}
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     *
+     * @example
+     *     await client.subAccount.confirmSubAccountWithdrawal({
+     *         id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+     *     })
+     */
+    public confirmSubAccountWithdrawal(
+        request: WhitebitApi.ConfirmSubAccountWithdrawalRequest,
+        requestOptions?: SubAccountClient.RequestOptions,
+    ): core.HttpResponsePromise<Record<string, unknown>> {
+        return core.HttpResponsePromise.fromPromise(this.__confirmSubAccountWithdrawal(request, requestOptions));
+    }
+
+    private async __confirmSubAccountWithdrawal(
+        request: WhitebitApi.ConfirmSubAccountWithdrawalRequest,
+        requestOptions?: SubAccountClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/sub-account/withdraw/confirm",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 401:
+                    throw new WhitebitApi.UnauthorizedError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/api/v4/sub-account/withdraw/confirm",
+        );
+    }
+
+    /**
+     * The endpoint generates a temporary KYC verification link for a [sub-account](/glossary#sub-account).
+     *
+     * <Note>
+     * The sub-account must meet all of the following conditions before a KYC URL can be generated:
+     * - The sub-account must be activated (have an associated user).
+     * - The sub-account must be active (not locked or blocked).
+     * - The sub-account must not have shared KYC enabled.
+     * </Note>
+     *
+     * <Warning>
+     * Rate limit: 1000 requests/10 sec.
+     * </Warning>
+     *
+     * <Note>
+     * The API does not cache the response.
+     * </Note>
+     *
+     * @param {WhitebitApi.GetSubAccountKycUrlRequest} request
+     * @param {SubAccountClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.UnauthorizedError}
+     * @throws {@link WhitebitApi.NotFoundError}
+     *
+     * @example
+     *     await client.subAccount.getSubAccountKycUrl({
+     *         id: "8e667b4a-0b71-4988-8af5-9474dbfaeb51"
+     *     })
+     */
+    public getSubAccountKycUrl(
+        request: WhitebitApi.GetSubAccountKycUrlRequest,
+        requestOptions?: SubAccountClient.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.GetSubAccountKycUrlResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__getSubAccountKycUrl(request, requestOptions));
+    }
+
+    private async __getSubAccountKycUrl(
+        request: WhitebitApi.GetSubAccountKycUrlRequest,
+        requestOptions?: SubAccountClient.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.GetSubAccountKycUrlResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/sub-account/kyc-url",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as WhitebitApi.GetSubAccountKycUrlResponse,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 401:
+                    throw new WhitebitApi.UnauthorizedError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/api/v4/sub-account/kyc-url");
     }
 }

@@ -3,11 +3,19 @@
 export interface MarketTodayUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `marketToday_update`. */
-    method: "marketToday_update";
+    method: MarketTodayUpdate.Method;
     /**
      * Update event parameters:
      * - [0] Market name
      * - [1] MarketTodayStatistics object
      */
     params: unknown[];
+}
+
+export namespace MarketTodayUpdate {
+    /** Method name. Fixed value: `marketToday_update`. */
+    export const Method = {
+        MarketTodayUpdate: "marketToday_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

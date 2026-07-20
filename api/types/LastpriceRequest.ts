@@ -4,6 +4,14 @@ export interface LastpriceRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `lastprice_request`. */
-    method: "lastprice_request";
+    method: LastpriceRequest.Method;
     params: unknown[];
+}
+
+export namespace LastpriceRequest {
+    /** Method name. Fixed value: `lastprice_request`. */
+    export const Method = {
+        LastpriceRequest: "lastprice_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

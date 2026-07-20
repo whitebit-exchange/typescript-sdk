@@ -4,7 +4,15 @@ export interface AuthorizeRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `authorize`. */
-    method: "authorize";
+    method: AuthorizeRequest.Method;
     /** Array with WebSocket token and constant "public" string */
     params: unknown[];
+}
+
+export namespace AuthorizeRequest {
+    /** Method name. Fixed value: `authorize`. */
+    export const Method = {
+        Authorize: "authorize",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

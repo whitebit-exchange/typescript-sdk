@@ -3,7 +3,15 @@
 export interface TradesSubscribe {
     id: number;
     /** Method name. Fixed value: `trades_subscribe`. */
-    method: "trades_subscribe";
+    method: TradesSubscribe.Method;
     /** Market names (empty array to subscribe to all markets) */
     params: string[];
+}
+
+export namespace TradesSubscribe {
+    /** Method name. Fixed value: `trades_subscribe`. */
+    export const Method = {
+        TradesSubscribe: "trades_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

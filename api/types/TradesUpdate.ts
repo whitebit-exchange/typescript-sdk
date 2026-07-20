@@ -3,11 +3,19 @@
 export interface TradesUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `trades_update`. */
-    method: "trades_update";
+    method: TradesUpdate.Method;
     /**
      * Update event parameters:
      * - [0] Market name
      * - [1] Array of Trade objects
      */
     params: unknown[];
+}
+
+export namespace TradesUpdate {
+    /** Method name. Fixed value: `trades_update`. */
+    export const Method = {
+        TradesUpdate: "trades_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

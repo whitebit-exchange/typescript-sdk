@@ -4,7 +4,15 @@ export interface BalanceSpotRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `balanceSpot_request`. */
-    method: "balanceSpot_request";
+    method: BalanceSpotRequest.Method;
     /** Array of asset tickers to query. Empty array returns all balances. */
     params: string[];
+}
+
+export namespace BalanceSpotRequest {
+    /** Method name. Fixed value: `balanceSpot_request`. */
+    export const Method = {
+        BalanceSpotRequest: "balanceSpot_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

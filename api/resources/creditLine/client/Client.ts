@@ -46,7 +46,7 @@ export class CreditLineClient {
      * @example
      *     await client.creditLine.getCreditLineInfo({
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public getCreditLineInfo(
@@ -64,7 +64,10 @@ export class CreditLineClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -97,10 +100,7 @@ export class CreditLineClient {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
                 case 404:
-                    throw new WhitebitApi.NotFoundError(
-                        _response.error.body as WhitebitApi.NotFoundErrorBody,
-                        _response.rawResponse,
-                    );
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,

@@ -12,6 +12,7 @@ export { CreateCollateralMarketOrderRequest } from "./CreateCollateralMarketOrde
 export { CreateCollateralOcoOrderRequest } from "./CreateCollateralOcoOrderRequest.js";
 export { CreateCollateralStopLimitOrderRequest } from "./CreateCollateralStopLimitOrderRequest.js";
 export { CreateCollateralTriggerMarketOrderRequest } from "./CreateCollateralTriggerMarketOrderRequest.js";
+export type { GetCollateralAccountAdlQuantileRequest } from "./GetCollateralAccountAdlQuantileRequest.js";
 export type { GetCollateralHedgeModeRequest } from "./GetCollateralHedgeModeRequest.js";
 export type { GetConditionalOrdersRequest } from "./GetConditionalOrdersRequest.js";
 export type { GetFundingHistoryRequest } from "./GetFundingHistoryRequest.js";

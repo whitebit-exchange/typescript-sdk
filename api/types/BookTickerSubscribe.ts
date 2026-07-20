@@ -4,6 +4,14 @@ export interface BookTickerSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `bookTicker_subscribe`. */
-    method: "bookTicker_subscribe";
+    method: BookTickerSubscribe.Method;
     params: string[];
+}
+
+export namespace BookTickerSubscribe {
+    /** Method name. Fixed value: `bookTicker_subscribe`. */
+    export const Method = {
+        BookTickerSubscribe: "bookTicker_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

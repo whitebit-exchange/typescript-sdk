@@ -44,7 +44,7 @@ export class JwtClient {
      *     await client.jwt.issueJwtToken({
      *         request: "{{request}}",
      *         nonceWindow: false,
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public issueJwtToken(
@@ -62,7 +62,10 @@ export class JwtClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -114,6 +117,20 @@ export class JwtClient {
      * The V4 endpoint can be used to retrieve the WebSocket token for user.
      * The token is required to authorize WebSocket connections for private API access.
      *
+     * <Accordion title="Errors">
+     * ```json
+     * {
+     *   "code": 30,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "user": ["user not found"]
+     *   }
+     * }
+     * ```
+     * </Accordion>
+     *
+     * Beyond the error above, this endpoint can return only the [common authentication errors](/api-reference/authentication).
+     *
      * <Warning>
      * Rate limit: 10 requests/60 sec.
      * </Warning>
@@ -131,7 +148,7 @@ export class JwtClient {
      * @example
      *     await client.jwt.getWebSocketToken({
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public getWebSocketToken(
@@ -149,7 +166,10 @@ export class JwtClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({

@@ -6,7 +6,7 @@
  *         code: "WBe11f4fce-2a53-4edc-b195-66b693bd77e3ETH",
  *         passphrase: "some passphrase",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface ApplyCodeRequest {
@@ -17,5 +17,5 @@ export interface ApplyCodeRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

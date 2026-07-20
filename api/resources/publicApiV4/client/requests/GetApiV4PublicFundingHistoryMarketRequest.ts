@@ -17,8 +17,8 @@ export interface GetApiV4PublicFundingHistoryMarketRequest {
     startDate?: number;
     /** End timestamp in seconds */
     endDate?: number;
-    /** Number of records to return. Default: 100, Maximum: 1000 */
+    /** Number of records to return. Default: 100, Maximum: 100 */
     limit?: number;
-    /** Number of records to skip */
+    /** Number of records to skip. Maximum: 1000000 */
     offset?: number;
 }

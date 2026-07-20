@@ -4,12 +4,17 @@ export interface BalanceSpotUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `balanceSpot_update`. */
-    method: "balanceSpot_update";
+    method: BalanceSpotUpdate.Method;
     /** Array containing balance updates for subscribed assets */
     params: Record<string, BalanceSpotUpdate.Params.Value>[];
 }
 
 export namespace BalanceSpotUpdate {
+    /** Method name. Fixed value: `balanceSpot_update`. */
+    export const Method = {
+        BalanceSpotUpdate: "balanceSpot_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
     export type Params = Params.Item[];
 
     export namespace Params {

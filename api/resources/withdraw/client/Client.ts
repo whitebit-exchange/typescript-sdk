@@ -44,6 +44,7 @@ export class WithdrawClient {
      * @param {WithdrawClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.PreconditionFailedError}
      * @throws {@link WhitebitApi.UnprocessableEntityError}
      *
      * @example
@@ -51,9 +52,9 @@ export class WithdrawClient {
      *         ticker: "ETH",
      *         amount: "0.9",
      *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
-     *         unique_id: "24529041",
+     *         uniqueId: "24529041",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -61,10 +62,10 @@ export class WithdrawClient {
      *         ticker: "USDT",
      *         amount: "0.9",
      *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
-     *         unique_id: "24529042",
+     *         uniqueId: "24529042",
      *         network: "ERC20",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -72,10 +73,22 @@ export class WithdrawClient {
      *         ticker: "UAH",
      *         amount: "100",
      *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
-     *         unique_id: "24529043",
+     *         uniqueId: "24529043",
      *         provider: "VISAMASTER",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
+     *     })
+     *
+     * @example
+     *     await client.withdraw.createWithdraw({
+     *         ticker: "USD",
+     *         amount: "150.00",
+     *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
+     *         uniqueId: "ab12cd34-9101-4abc-9def-1234567890ab",
+     *         provider: "VISAMASTER",
+     *         customerIp: "203.0.113.42",
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -83,11 +96,11 @@ export class WithdrawClient {
      *         ticker: "UAH",
      *         amount: "50000",
      *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
-     *         unique_id: "24529045",
+     *         uniqueId: "24529045",
      *         provider: "VISAMASTER_PAYCORE",
      *         partialEnable: true,
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -95,7 +108,7 @@ export class WithdrawClient {
      *         ticker: "UAH",
      *         amount: "50000",
      *         address: "UA213223130000026007233566001",
-     *         unique_id: "24529045",
+     *         uniqueId: "24529045",
      *         provider: "UAH_IBAN",
      *         beneficiary: {
      *             firstName: "Firstname",
@@ -103,7 +116,7 @@ export class WithdrawClient {
      *             tin: 1000000000
      *         },
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -111,7 +124,7 @@ export class WithdrawClient {
      *         ticker: "USD",
      *         amount: "30000",
      *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
-     *         unique_id: "24529045",
+     *         uniqueId: "24529045",
      *         provider: "USD_VISAMASTER",
      *         beneficiary: {
      *             firstName: "Firstname",
@@ -120,7 +133,7 @@ export class WithdrawClient {
      *             email: "john_doe@email.com"
      *         },
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      *
      * @example
@@ -128,31 +141,98 @@ export class WithdrawClient {
      *         ticker: "BTC",
      *         amount: "0.5",
      *         address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-     *         unique_id: "24529046",
+     *         uniqueId: "24529048",
      *         travelRule: {
-     *             type: "individual",
-     *             vasp: "Binance",
-     *             name: "John",
-     *             address: "123 Business Street, London, UK"
+     *             walletType: "hosted",
+     *             beneficiary: {
+     *                 type: "individual",
+     *                 firstName: "John",
+     *                 lastName: "Doe",
+     *                 residenceCountry: "DEU",
+     *                 address: {
+     *                     country: "DEU",
+     *                     city: "Berlin",
+     *                     addressLine1: "Alexanderplatz 1"
+     *                 }
+     *             },
+     *             vaspData: {
+     *                 vaspId: "vasp-001"
+     *             }
      *         },
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
+     *     })
+     *
+     * @example
+     *     await client.withdraw.createWithdraw({
+     *         ticker: "USDT",
+     *         amount: "10000",
+     *         address: "0x742d35Cc6634C0532925a3b844Bc9e7595f8a2B1",
+     *         uniqueId: "24529049",
+     *         network: "ERC20",
+     *         travelRule: {
+     *             walletType: "hosted",
+     *             beneficiary: {
+     *                 type: "entity",
+     *                 fullName: "Acme Trading Ltd",
+     *                 residenceCountry: "GBR",
+     *                 address: {
+     *                     country: "GBR",
+     *                     city: "London",
+     *                     postCode: "EC2A 4BX",
+     *                     addressLine1: "123 Finsbury Square"
+     *                 }
+     *             },
+     *             vaspData: {
+     *                 vaspName: "Famous Vasp Inc"
+     *             }
+     *         },
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
+     *     })
+     *
+     * @example
+     *     await client.withdraw.createWithdraw({
+     *         ticker: "ETH",
+     *         amount: "2.5",
+     *         address: "0xabcdef1234567890abcdef1234567890abcdef12",
+     *         uniqueId: "24529050",
+     *         travelRule: {
+     *             walletType: "unhosted",
+     *             beneficiary: {
+     *                 type: "individual",
+     *                 firstName: "Jane",
+     *                 lastName: "Smith",
+     *                 residenceCountry: "NLD",
+     *                 address: {
+     *                     country: "NLD",
+     *                     city: "Amsterdam",
+     *                     addressLine1: "Damrak 1"
+     *                 }
+     *             }
+     *         },
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
      *     })
      *
      * @example
      *     await client.withdraw.createWithdraw({
      *         ticker: "BTC",
-     *         amount: "1.2",
+     *         amount: "0.5",
      *         address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-     *         unique_id: "24529047",
-     *         travelRule: {
-     *             type: "entity",
-     *             vasp: "Kraken",
-     *             name: "Acme Corp",
-     *             address: "123 Business Street, London, UK"
-     *         },
+     *         uniqueId: "24529051",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
+     *     })
+     *
+     * @example
+     *     await client.withdraw.createWithdraw({
+     *         ticker: "BTC",
+     *         amount: "1.0",
+     *         address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+     *         uniqueId: "24529052",
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
      *     })
      */
     public createWithdraw(
@@ -170,7 +250,10 @@ export class WithdrawClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -202,6 +285,11 @@ export class WithdrawClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 412:
+                    throw new WhitebitApi.PreconditionFailedError(
+                        _response.error.body as WhitebitApi.ErrorInner,
+                        _response.rawResponse,
+                    );
                 case 422:
                     throw new WhitebitApi.UnprocessableEntityError(
                         _response.error.body as unknown,
@@ -243,6 +331,7 @@ export class WithdrawClient {
      * @param {WithdrawClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.PreconditionFailedError}
      * @throws {@link WhitebitApi.UnprocessableEntityError}
      *
      * @example
@@ -250,9 +339,9 @@ export class WithdrawClient {
      *         ticker: "ETH",
      *         amount: "0.9",
      *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
-     *         unique_id: "24529041",
+     *         uniqueId: "24529041",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createWithdrawPay(
@@ -270,7 +359,10 @@ export class WithdrawClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -302,6 +394,11 @@ export class WithdrawClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 412:
+                    throw new WhitebitApi.PreconditionFailedError(
+                        _response.error.body as WhitebitApi.ErrorInner,
+                        _response.rawResponse,
+                    );
                 case 422:
                     throw new WhitebitApi.UnprocessableEntityError(
                         _response.error.body as unknown,
@@ -321,6 +418,111 @@ export class WithdrawClient {
             _response.rawResponse,
             "POST",
             "/api/v4/main-account/withdraw-pay",
+        );
+    }
+
+    /**
+     * The endpoint creates a signed, single-use Express Withdraw payment token that charges a specific amount from a WhiteBIT user's balance to the partner's [Main balance](/glossary#balance-main) in an instant, off-chain, zero-[fee](/glossary#fee) internal transfer. The response returns a URL that embeds the token; the paying user confirms the exact [ticker](/glossary#ticker) and amount on the WhiteBIT-hosted confirmation surface.
+     *
+     * Token and payment constraints:
+     * - Each token is single-use: WhiteBIT marks the token used at confirmation and rejects any replay.
+     * - Each token expires 90 seconds after creation; the `expireAt` response field carries the authoritative expiry timestamp. Generate the token as close as possible to the moment of presenting the URL to the user.
+     * - The [ticker](/glossary#ticker) must be a withdrawal-enabled cryptocurrency; the endpoint rejects [fiat](/glossary#fiat) tickers.
+     * - Each payment is capped at the equivalent of 10,000 USDT; WhiteBIT enforces the cap at token creation and re-enforces the cap at confirmation.
+     * - WhiteBIT rejects self-payments: the paying user and the token creator must be different WhiteBIT accounts.
+     * - The endpoint is idempotent per `externalId`: re-submitting the same `externalId` with an identical `ticker` and `amount` while the token is still valid returns the same token instead of creating a duplicate charge. After the token expires, the same `externalId` receives a fresh token.
+     *
+     * <Note>
+     * Standard private-API rate limits apply — see [Rate limits](/api-reference/rate-limits). The endpoint carries no endpoint-specific limit.
+     * </Note>
+     *
+     * @param {WhitebitApi.CreateExpressWithdrawTokenRequest} request
+     * @param {WithdrawClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.ForbiddenError}
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     *
+     * @example
+     *     await client.withdraw.createExpressWithdrawToken({
+     *         ticker: "USDT",
+     *         amount: "25.50",
+     *         externalId: "order-100294",
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
+     *     })
+     */
+    public createExpressWithdrawToken(
+        request: WhitebitApi.CreateExpressWithdrawTokenRequest,
+        requestOptions?: WithdrawClient.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.CreateExpressWithdrawTokenResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__createExpressWithdrawToken(request, requestOptions));
+    }
+
+    private async __createExpressWithdrawToken(
+        request: WhitebitApi.CreateExpressWithdrawTokenRequest,
+        requestOptions?: WithdrawClient.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.CreateExpressWithdrawTokenResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/main-account/express-withdraw/token",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as WhitebitApi.CreateExpressWithdrawTokenResponse,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new WhitebitApi.ForbiddenError(_response.error.body as unknown, _response.rawResponse);
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/api/v4/main-account/express-withdraw/token",
         );
     }
 }

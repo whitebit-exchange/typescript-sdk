@@ -4,7 +4,7 @@ export interface DepthRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `depth_request`. */
-    method: "depth_request";
+    method: DepthRequest.Method;
     /**
      * Query parameters:
      * - [0] Market name
@@ -12,4 +12,12 @@ export interface DepthRequest {
      * - [2] Price interval units (e.g., "0", "0.01", "0.1")
      */
     params: unknown[];
+}
+
+export namespace DepthRequest {
+    /** Method name. Fixed value: `depth_request`. */
+    export const Method = {
+        DepthRequest: "depth_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

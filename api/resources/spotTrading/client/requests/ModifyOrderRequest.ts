@@ -5,14 +5,14 @@
  *     {
  *         market: "BTC_USDT",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface ModifyOrderRequest {
-    /** Active order id. Required if client_order_id is not set. */
-    order_id?: number;
-    /** Identifier should be unique and contain letters, dashes, numbers, dots or underscores. Required if order_id is not set. */
-    client_order_id?: string;
+    /** Active order id. Required if clientOrderId is not set. */
+    orderId?: number;
+    /** Identifier should be unique and contain letters, dashes, numbers, dots or underscores. Required if orderId is not set. */
+    clientOrderId?: string;
     /** Available [market](/glossary#market). Example: BTC_USDT */
     market: string;
     /** Amount of [stock](/glossary#stock) currency to buy or sell. Example: '0.001' or 0.001 */
@@ -24,5 +24,5 @@ export interface ModifyOrderRequest {
     /** Activation price in [money](/glossary#money) currency. Example: '10000' or 10000 */
     activationPrice?: string;
     request: string;
-    nonce: string;
+    nonce: number;
 }

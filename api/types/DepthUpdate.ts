@@ -3,7 +3,7 @@
 export interface DepthUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `depth_update`. */
-    method: "depth_update";
+    method: DepthUpdate.Method;
     /**
      * Update event parameters:
      * - [0] Full reload flag (true=full snapshot, false=incremental)
@@ -11,4 +11,12 @@ export interface DepthUpdate {
      * - [2] Market name
      */
     params: unknown[];
+}
+
+export namespace DepthUpdate {
+    /** Method name. Fixed value: `depth_update`. */
+    export const Method = {
+        DepthUpdate: "depth_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

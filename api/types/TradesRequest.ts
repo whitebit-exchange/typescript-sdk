@@ -4,7 +4,7 @@ export interface TradesRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `trades_request`. */
-    method: "trades_request";
+    method: TradesRequest.Method;
     /**
      * Query parameters:
      * - [0] Market name
@@ -12,4 +12,12 @@ export interface TradesRequest {
      * - [2] Largest trade ID to request from
      */
     params: unknown[];
+}
+
+export namespace TradesRequest {
+    /** Method name. Fixed value: `trades_request`. */
+    export const Method = {
+        TradesRequest: "trades_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

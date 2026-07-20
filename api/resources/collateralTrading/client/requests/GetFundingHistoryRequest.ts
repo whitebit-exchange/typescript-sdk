@@ -7,7 +7,7 @@
  *         limit: 100,
  *         offset: 0,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetFundingHistoryRequest {
@@ -24,5 +24,5 @@ export interface GetFundingHistoryRequest {
     /** Request signature */
     request?: string;
     /** Unique request identifier */
-    nonce?: string;
+    nonce?: number;
 }

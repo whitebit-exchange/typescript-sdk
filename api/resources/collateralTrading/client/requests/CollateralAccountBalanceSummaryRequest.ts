@@ -5,7 +5,7 @@
  *     {
  *         ticker: "BTC",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CollateralAccountBalanceSummaryRequest {
@@ -18,5 +18,5 @@ export interface CollateralAccountBalanceSummaryRequest {
     /** Request signature */
     request?: string;
     /** Unique request identifier */
-    nonce?: string;
+    nonce?: number;
 }

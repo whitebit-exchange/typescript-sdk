@@ -4,7 +4,7 @@ export interface OrdersExecutedRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `ordersExecuted_request`. */
-    method: "ordersExecuted_request";
+    method: OrdersExecutedRequest.Method;
     /**
      * Query parameters tuple:
      * - [0] Filter object with market and order_types
@@ -12,4 +12,12 @@ export interface OrdersExecutedRequest {
      * - [2] Limit (max 100)
      */
     params: unknown[];
+}
+
+export namespace OrdersExecutedRequest {
+    /** Method name. Fixed value: `ordersExecuted_request`. */
+    export const Method = {
+        OrdersExecutedRequest: "ordersExecuted_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

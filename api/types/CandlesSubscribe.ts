@@ -4,11 +4,19 @@ export interface CandlesSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `candles_subscribe`. */
-    method: "candles_subscribe";
+    method: CandlesSubscribe.Method;
     /**
      * Subscription parameters:
      * - [0] Market name (e.g., BTC_USD)
      * - [1] Interval in seconds
      */
     params: unknown[];
+}
+
+export namespace CandlesSubscribe {
+    /** Method name. Fixed value: `candles_subscribe`. */
+    export const Method = {
+        CandlesSubscribe: "candles_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

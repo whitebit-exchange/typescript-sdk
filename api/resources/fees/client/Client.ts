@@ -29,6 +29,8 @@ export class FeesClient {
      * Returns an array of objects containing deposit/withdrawal [fees](/glossary#fee) for the corresponding currencies.
      * Zero value in amount fields means that the setting is disabled.
      *
+     * The endpoint takes no input beyond the signed request envelope and returns the full per-currency fee schedule on success. It can return only the [common authentication errors](/api-reference/authentication).
+     *
      * <Warning>
      * Rate limit: 1000 requests/10 sec.
      * </Warning>
@@ -43,25 +45,28 @@ export class FeesClient {
      * @example
      *     await client.fees.getFees({
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public getFees(
         request: WhitebitApi.GetFeesRequest,
         requestOptions?: FeesClient.RequestOptions,
-    ): core.HttpResponsePromise<WhitebitApi.FeeInfo[]> {
+    ): core.HttpResponsePromise<WhitebitApi.MainAccountFeeInfo[]> {
         return core.HttpResponsePromise.fromPromise(this.__getFees(request, requestOptions));
     }
 
     private async __getFees(
         request: WhitebitApi.GetFeesRequest,
         requestOptions?: FeesClient.RequestOptions,
-    ): Promise<core.WithRawResponse<WhitebitApi.FeeInfo[]>> {
+    ): Promise<core.WithRawResponse<WhitebitApi.MainAccountFeeInfo[]>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -86,7 +91,7 @@ export class FeesClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as WhitebitApi.FeeInfo[], rawResponse: _response.rawResponse };
+            return { data: _response.body as WhitebitApi.MainAccountFeeInfo[], rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {

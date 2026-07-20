@@ -4,14 +4,14 @@
  * @example
  *     {
  *         market: "BTC_USDT",
- *         order_id: 117703764514,
+ *         orderId: 117703764514,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CancelOcoOrderRequest {
     market: string;
-    order_id: number;
+    orderId: number;
     request: string;
-    nonce: string;
+    nonce: number;
 }

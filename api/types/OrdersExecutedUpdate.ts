@@ -6,7 +6,15 @@ export interface OrdersExecutedUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `ordersExecuted_update`. */
-    method: "ordersExecuted_update";
+    method: OrdersExecutedUpdate.Method;
     /** Array containing executed order object */
     params: WhitebitApi.ExecutedOrderObject[];
+}
+
+export namespace OrdersExecutedUpdate {
+    /** Method name. Fixed value: `ordersExecuted_update`. */
+    export const Method = {
+        OrdersExecutedUpdate: "ordersExecuted_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

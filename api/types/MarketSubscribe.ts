@@ -3,6 +3,14 @@
 export interface MarketSubscribe {
     id: number;
     /** Method name. Fixed value: `market_subscribe`. */
-    method: "market_subscribe";
+    method: MarketSubscribe.Method;
     params: string[];
+}
+
+export namespace MarketSubscribe {
+    /** Method name. Fixed value: `market_subscribe`. */
+    export const Method = {
+        MarketSubscribe: "market_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

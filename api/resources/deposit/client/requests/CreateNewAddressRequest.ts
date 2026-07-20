@@ -5,7 +5,7 @@
  *     {
  *         ticker: "XLM",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -13,7 +13,7 @@
  *         ticker: "USDT",
  *         network: "ERC20",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -21,7 +21,7 @@
  *         ticker: "BTC",
  *         type: "bech32",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CreateNewAddressRequest {
@@ -34,7 +34,7 @@ export interface CreateNewAddressRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }
 
 export namespace CreateNewAddressRequest {

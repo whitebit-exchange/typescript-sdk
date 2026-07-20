@@ -5,11 +5,11 @@ export interface GetApiV4PublicTradesMarketResponseItem {
     tradeID: number;
     /** Transaction price in quote pair volume. */
     price: string;
-    /** Transaction amount in quote pair volume. */
+    /** Transaction amount in the quote (stock) currency. In a BTC_USDT market, the value is the BTC amount. Note: WhiteBIT uses a reversed naming convention compared to standard exchange terminology — the stock/asset currency is called 'quote' here. */
     quote_volume: string;
-    /** Transaction amount in base pair volume. */
+    /** Transaction amount in the base (money) currency. In a BTC_USDT market, the value is the USDT amount. Note: WhiteBIT uses a reversed naming convention compared to standard exchange terminology — the settlement/pricing currency is called 'base' here. */
     base_volume: string;
-    /** Unix timestamp in milliseconds, identifies when the transaction occurred. */
+    /** Unix timestamp in seconds (UTC). Identifies when the transaction occurred. */
     trade_timestamp: number;
     /** Used to determine whether or not the transaction originated as a buy or sell. Buy – Identifies an ask that was removed from the order book. Sell – Identifies a bid that was removed from the order book. */
     type: GetApiV4PublicTradesMarketResponseItem.Type;

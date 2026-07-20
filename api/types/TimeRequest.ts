@@ -4,6 +4,14 @@ import type * as WhitebitApi from "../index.js";
 
 export interface TimeRequest extends WhitebitApi.BaseRequest {
     /** Method name. Fixed value: `time`. */
-    method?: "time" | undefined;
+    method?: TimeRequest.Method | undefined;
     params?: unknown[] | undefined;
+}
+
+export namespace TimeRequest {
+    /** Method name. Fixed value: `time`. */
+    export const Method = {
+        Time: "time",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

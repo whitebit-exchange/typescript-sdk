@@ -4,7 +4,7 @@
  * @example
  *     {
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetMainBalanceRequest {
@@ -13,5 +13,5 @@ export interface GetMainBalanceRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

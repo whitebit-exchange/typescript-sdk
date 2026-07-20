@@ -7,7 +7,7 @@
  *         ticker: "XLM",
  *         amount: "0.9",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  *
  * @example
@@ -17,7 +17,7 @@
  *         ticker: "XLM",
  *         amount: "0.9",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface TransferBetweenBalancesRequest {
@@ -50,7 +50,7 @@ export interface TransferBetweenBalancesRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }
 
 export namespace TransferBetweenBalancesRequest {

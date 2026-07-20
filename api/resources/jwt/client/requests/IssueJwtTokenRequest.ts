@@ -5,7 +5,7 @@
  *     {
  *         request: "{{request}}",
  *         nonceWindow: false,
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface IssueJwtTokenRequest {
@@ -14,5 +14,5 @@ export interface IssueJwtTokenRequest {
     /** Nonce window setting */
     nonceWindow?: boolean;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

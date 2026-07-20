@@ -11,16 +11,16 @@ export interface ConvertHistoryRequest {
     fromTicker?: string;
     /** To currency. Example: USDT */
     toTicker?: string;
-    /** From time filter. Example: 1699260637. Default: now() */
+    /** From time filter (Unix seconds). Must be no more than 30 days before `to` and no older than 6 months. Example: 1699260637. Default: now() */
     from?: string;
-    /** To time filter. Example: 1699260637. Default: now() + */
+    /** To time filter (Unix seconds). Must be no more than 30 days after `from`. Example: 1699260637. Default: now() */
     to?: string;
     /** Quote Id. Example: 4050 */
     quoteId?: string;
-    /** How many records to receive. Default: 100 */
-    limit?: string;
-    /** Amount to convert or receive. Default 0 */
-    offset?: string;
+    /** How many records to receive. Allowed range: 1–100. Default: 100 */
+    limit?: number;
+    /** Number of records to skip for pagination. Minimum: 0. Default: 0 */
+    offset?: number;
     /** Nonce for request */
     nonce?: number;
     /** Request path */

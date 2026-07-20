@@ -4,7 +4,7 @@ export interface DealsUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `deals_update`. */
-    method: "deals_update";
+    method: DealsUpdate.Method;
     /**
      * Update event tuple (11 elements):
      * - [0] Deal ID
@@ -20,4 +20,12 @@ export interface DealsUpdate {
      * - [10] Fee asset
      */
     params: unknown[];
+}
+
+export namespace DealsUpdate {
+    /** Method name. Fixed value: `deals_update`. */
+    export const Method = {
+        DealsUpdate: "deals_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

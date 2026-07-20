@@ -6,12 +6,12 @@
  *         market: "BTC_USDT",
  *         otoId: 117703764514,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CancelOtoOrderRequest {
     market: string;
     otoId: number;
     request: string;
-    nonce: string;
+    nonce: number;
 }

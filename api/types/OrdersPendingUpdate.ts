@@ -4,7 +4,15 @@ export interface OrdersPendingUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `ordersPending_update`. */
-    method: "ordersPending_update";
+    method: OrdersPendingUpdate.Method;
     /** Array with update event ID and order object */
     params: unknown[];
+}
+
+export namespace OrdersPendingUpdate {
+    /** Method name. Fixed value: `ordersPending_update`. */
+    export const Method = {
+        OrdersPendingUpdate: "ordersPending_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

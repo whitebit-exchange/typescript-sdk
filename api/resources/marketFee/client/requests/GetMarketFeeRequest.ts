@@ -7,14 +7,6 @@
  *     }
  */
 export interface GetMarketFeeRequest {
-    /**
-     * Market to query.
-     *
-     * If the request includes the `market` parameter, the system returns fees for the specified market only.
-     *
-     * When fee values are identical across markets, the response contains identical values regardless of the specified market.
-     *
-     * Example: BTC_USDT
-     */
-    market: string;
+    /** Optional. Currently ignored by the API — all market fees are returned regardless of the value provided. Retained for backward compatibility. Example: BTC_USDT */
+    market?: string;
 }

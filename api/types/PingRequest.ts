@@ -4,6 +4,14 @@ import type * as WhitebitApi from "../index.js";
 
 export interface PingRequest extends WhitebitApi.BaseRequest {
     /** Method name. Fixed value: `ping`. */
-    method?: "ping" | undefined;
+    method?: PingRequest.Method | undefined;
     params?: unknown[] | undefined;
+}
+
+export namespace PingRequest {
+    /** Method name. Fixed value: `ping`. */
+    export const Method = {
+        Ping: "ping",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

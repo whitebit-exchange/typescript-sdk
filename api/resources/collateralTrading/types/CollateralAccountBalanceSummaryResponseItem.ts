@@ -3,12 +3,12 @@
 export interface CollateralAccountBalanceSummaryResponseItem {
     /** Asset ticker symbol */
     asset?: string | undefined;
-    /** Current balance amount */
+    /** Total collateral balance for the asset, in the asset's native units */
     balance?: string | undefined;
-    /** Amount currently borrowed */
+    /** Amount currently borrowed against the asset, in the asset's native units */
     borrow?: string | undefined;
-    /** Available balance without using borrow */
+    /** Balance available for use without additional borrowing, in the asset's native units */
     availableWithoutBorrow?: string | undefined;
-    /** Available balance including borrowing capacity */
+    /** Maximum balance available when borrowing capacity is included, in the asset's native units */
     availableWithBorrow?: string | undefined;
 }

@@ -4,7 +4,15 @@ export interface UnsubscribeRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `positionsMargin_unsubscribe`. */
-    method: "positionsMargin_unsubscribe";
+    method: UnsubscribeRequest.Method;
     /** Empty array for unsubscribe */
     params: unknown[];
+}
+
+export namespace UnsubscribeRequest {
+    /** Method name. Fixed value: `positionsMargin_unsubscribe`. */
+    export const Method = {
+        PositionsMarginUnsubscribe: "positionsMargin_unsubscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

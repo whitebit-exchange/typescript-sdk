@@ -7,7 +7,7 @@ import * as core from "../../../../core/index.js";
 import * as environments from "../../../../environments.js";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError.js";
 import * as errors from "../../../../errors/index.js";
-import type * as WhitebitApi from "../../../index.js";
+import * as WhitebitApi from "../../../index.js";
 
 export declare namespace PublicApiV4Client {
     export type Options = BaseClientOptions;
@@ -23,7 +23,7 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves maintenance status
+     * The endpoint retrieves the current maintenance status of the WhiteBIT platform. Use the response to detect scheduled downtime and pause trading automation during maintenance windows. The `status` field returns `"system operational"` when all platform services are available, or `"system maintenance"` when the platform is undergoing planned maintenance.
      *
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -43,7 +43,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -88,10 +91,14 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves all information about available spot and futures markets.
+     * The endpoint retrieves configuration and trading rules for all available spot, futures, and TradFi futures markets. Use the response to discover tradeable pairs, check minimum order sizes, and read fee schedules. Each entry includes precision settings, fee ratios, and order-size constraints for the market.
      *
      * <Note>
-     * The API caches the response for 1 second
+     * Market configuration is reference data, re-synced from the database approximately every 10 seconds. Polling more frequently returns identical data. The cache is shared across all callers.
+     * </Note>
+     *
+     * <Note>
+     * TradFi futures markets are region-gated. Markets not available in a given region are omitted from the response entirely and do not appear under any other market type.
      * </Note>
      *
      * <Warning>
@@ -116,7 +123,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -184,7 +194,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -224,10 +237,10 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves the assets status.
+     * The endpoint retrieves the deposit and withdrawal status for every supported asset. Use the response to check whether deposits and withdrawals are enabled, read per-network fee and limit details, and determine required blockchain confirmation counts. The response includes crypto assets, fiat currencies, and fiat payment methods.
      *
      * <Note>
-     * The API caches the response for 1 second
+     * Asset status is reference data, re-synced approximately once per minute. Polling more frequently returns identical data. The cache is shared across all callers.
      * </Note>
      *
      * <Warning>
@@ -252,7 +265,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -302,6 +318,8 @@ export class PublicApiV4Client {
      * @param {WhitebitApi.GetApiV4PublicOrderbookMarketRequest} request
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     *
      * @example
      *     await client.publicApiV4.orderbook({
      *         market: "BTC_USDT",
@@ -329,7 +347,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -355,11 +376,19 @@ export class PublicApiV4Client {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         return handleNonStatusCodeError(
@@ -384,6 +413,8 @@ export class PublicApiV4Client {
      * @param {WhitebitApi.GetApiV4PublicOrderbookDepthMarketRequest} request
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     *
      * @example
      *     await client.publicApiV4.depth({
      *         market: "BTC_USDT"
@@ -405,7 +436,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -431,11 +465,19 @@ export class PublicApiV4Client {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         return handleNonStatusCodeError(
@@ -465,6 +507,8 @@ export class PublicApiV4Client {
      * @param {WhitebitApi.GetApiV4PublicTradesMarketRequest} request
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     *
      * @example
      *     await client.publicApiV4.recentTrades({
      *         market: "BTC_USDT"
@@ -489,7 +533,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -518,11 +565,19 @@ export class PublicApiV4Client {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         return handleNonStatusCodeError(
@@ -534,10 +589,10 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves the list of [fees](/glossary#fee) and min/max amounts for deposits and withdrawals
+     * The endpoint retrieves the [fee](/glossary#fee) schedule and deposit/withdrawal limits for every supported asset. Use the response to display fee estimates before a user initiates a deposit or withdrawal. The response is keyed by currency ticker; each entry contains deposit and withdrawal fee amounts and min/max transfer limits.
      *
      * <Note>
-     * The API caches the response for 1 second
+     * The fee schedule is reference data, re-synced approximately once per minute. Polling more frequently returns identical data. The cache is shared across all callers.
      * </Note>
      *
      * <Warning>
@@ -549,18 +604,23 @@ export class PublicApiV4Client {
      * @example
      *     await client.publicApiV4.fee()
      */
-    public fee(requestOptions?: PublicApiV4Client.RequestOptions): core.HttpResponsePromise<Record<string, unknown>> {
+    public fee(
+        requestOptions?: PublicApiV4Client.RequestOptions,
+    ): core.HttpResponsePromise<Record<string, WhitebitApi.FeeInfo>> {
         return core.HttpResponsePromise.fromPromise(this.__fee(requestOptions));
     }
 
     private async __fee(
         requestOptions?: PublicApiV4Client.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
+    ): Promise<core.WithRawResponse<Record<string, WhitebitApi.FeeInfo>>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -582,7 +642,7 @@ export class PublicApiV4Client {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+            return { data: _response.body as Record<string, WhitebitApi.FeeInfo>, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -597,10 +657,10 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves the current server time.
+     * The endpoint retrieves the current server time as a Unix timestamp. Use the response to synchronize local clocks before generating HMAC signatures for authenticated requests. The endpoint takes no parameters and has no request-validation errors; it returns HTTP 200 on success and fails only at the infrastructure level (see the API description).
      *
      * <Note>
-     * The API caches the response for 1 second
+     * The server time is computed per request and is not cached.
      * </Note>
      *
      * <Warning>
@@ -625,7 +685,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -665,10 +728,10 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves the current API life-state.
+     * The endpoint checks API availability by returning a simple health-check response. Use the endpoint to verify network connectivity and confirm the API server is reachable. A successful response contains the string `"pong"`. The endpoint takes no parameters and has no request-validation errors; it returns HTTP 200 on success and fails only at the infrastructure level (see the API description).
      *
      * <Note>
-     * The API caches the response for 1 second
+     * The health-check response is generated per request and is not cached.
      * </Note>
      *
      * <Warning>
@@ -691,7 +754,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -728,10 +794,10 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint returns the list of [markets](/glossary#market) that are available for [collateral](/glossary#collateral) trading
+     * The endpoint returns the list of [market](/glossary#market) pair names available for [collateral](/glossary#collateral) trading. Use the response to determine which markets support margin positions. Each item in the result array is a market pair name in `BASE_QUOTE` format (e.g., `BTC_USDT`).
      *
      * <Note>
-     * The API caches the response for 1 second
+     * The collateral market list is reference data, re-synced approximately every 10 seconds. Polling more frequently returns identical data. The cache is shared across all callers.
      * </Note>
      *
      * <Warning>
@@ -756,7 +822,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -801,7 +870,7 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint returns the list of available futures markets.
+     * The endpoint returns detailed information for all available futures markets. Use the response to read current pricing, open interest, funding rates, and leverage bracket configuration. Each entry includes the predicted next funding rate, settlement timestamps, and maximum allowed position sizes per leverage level.
      *
      * <Note>
      * The API caches the response for 1 second
@@ -829,7 +898,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -869,14 +941,28 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint returns the funding rate history for a specified futures market.
+     * The endpoint returns the funding rate history for a specified futures market. Use the response to analyze historical funding rate trends and settlement prices. Results are sorted by funding time in descending order and support offset-based pagination via `limit` and `offset` parameters.
      *
      * <Warning>
      * Rate limit 2000 requests/10 sec.
      * </Warning>
      *
+     * <Note>
+     * This endpoint supports pagination. Use `limit` (default: 100, max: 100) and `offset` (default: 0, max: 1000000) to page through results.
+     * </Note>
+     *
+     * <Note>
+     * The response is a plain array with no `total`, `has_more`, or cursor — a returned count below `limit` marks the last page (an empty array means no further records).
+     * </Note>
+     *
+     * <Note>
+     * Funding history is served per request at the API layer, with no application-level cache.
+     * </Note>
+     *
      * @param {WhitebitApi.GetApiV4PublicFundingHistoryMarketRequest} request
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
      *
      * @example
      *     await client.publicApiV4.fundingHistory({
@@ -909,7 +995,10 @@ export class PublicApiV4Client {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -938,11 +1027,19 @@ export class PublicApiV4Client {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         return handleNonStatusCodeError(
@@ -951,71 +1048,5 @@ export class PublicApiV4Client {
             "GET",
             "/api/v4/public/funding-history/{market}",
         );
-    }
-
-    /**
-     * The endpoint returns overall information about the current mining pool state.
-     *
-     * Hash rate is expressed in H units.
-     *
-     * <Warning>
-     * Rate limit 1000 requests/10 sec.
-     * </Warning>
-     *
-     * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.publicApiV4.miningPoolOverview()
-     */
-    public miningPoolOverview(
-        requestOptions?: PublicApiV4Client.RequestOptions,
-    ): core.HttpResponsePromise<WhitebitApi.GetApiV4PublicMiningPoolResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__miningPoolOverview(requestOptions));
-    }
-
-    private async __miningPoolOverview(
-        requestOptions?: PublicApiV4Client.RequestOptions,
-    ): Promise<core.WithRawResponse<WhitebitApi.GetApiV4PublicMiningPoolResponse>> {
-        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
-        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            _authRequest.headers,
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
-            requestOptions?.headers,
-        );
-        const _response = await core.fetcher({
-            url: core.url.join(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (
-                        (await core.Supplier.get(this._options.environment)) ??
-                        environments.WhitebitApiEnvironment.Default
-                    ).base,
-                "api/v4/public/mining-pool",
-            ),
-            method: "GET",
-            headers: _headers,
-            queryParameters: requestOptions?.queryParams,
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
-            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
-            abortSignal: requestOptions?.abortSignal,
-            fetchFn: this._options?.fetch,
-            logging: this._options.logging,
-        });
-        if (_response.ok) {
-            return {
-                data: _response.body as WhitebitApi.GetApiV4PublicMiningPoolResponse,
-                rawResponse: _response.rawResponse,
-            };
-        }
-
-        if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
-        }
-
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/api/v4/public/mining-pool");
     }
 }

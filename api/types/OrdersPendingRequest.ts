@@ -4,7 +4,15 @@ export interface OrdersPendingRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `ordersPending_request`. */
-    method: "ordersPending_request";
+    method: OrdersPendingRequest.Method;
     /** Array with market, offset, and limit */
     params: unknown[];
+}
+
+export namespace OrdersPendingRequest {
+    /** Method name. Fixed value: `ordersPending_request`. */
+    export const Method = {
+        OrdersPendingRequest: "ordersPending_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

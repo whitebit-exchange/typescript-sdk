@@ -21,8 +21,10 @@ export interface GetPositionsHistoryResponseItem {
     liquidationState?: (GetPositionsHistoryResponseItem.LiquidationState | null) | undefined;
     /** Details of order which changes position */
     orderDetail?: GetPositionsHistoryResponseItem.OrderDetail | undefined;
-    /** Position side */
-    positionSide?: GetPositionsHistoryResponseItem.PositionSide | undefined;
+    /** Position direction. `BOTH` indicates a one-way mode position; `LONG` or `SHORT` indicates a hedge mode position. See [position side](/glossary#position-side). */
+    side?: GetPositionsHistoryResponseItem.Side | undefined;
+    /** Indicates whether [hedge mode](/glossary#hedge-mode) was active when the position was opened. Hedge-mode toggling requires zero open positions, so the value also reflects the account mode at every event in the position's lifetime. */
+    isHedge?: boolean | undefined;
 }
 
 export namespace GetPositionsHistoryResponseItem {
@@ -51,11 +53,11 @@ export namespace GetPositionsHistoryResponseItem {
         realizedPnl?: (string | null) | undefined;
     }
 
-    /** Position side */
-    export const PositionSide = {
+    /** Position direction. `BOTH` indicates a one-way mode position; `LONG` or `SHORT` indicates a hedge mode position. See [position side](/glossary#position-side). */
+    export const Side = {
         Long: "LONG",
         Short: "SHORT",
         Both: "BOTH",
     } as const;
-    export type PositionSide = (typeof PositionSide)[keyof typeof PositionSide];
+    export type Side = (typeof Side)[keyof typeof Side];
 }

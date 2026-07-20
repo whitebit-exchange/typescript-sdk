@@ -11,6 +11,14 @@ export interface AuthorizeResponse {
 export namespace AuthorizeResponse {
     export interface Result {
         /** Fixed value: `success`. */
-        status: "success";
+        status: Result.Status;
+    }
+
+    export namespace Result {
+        /** Fixed value: `success`. */
+        export const Status = {
+            Success: "success",
+        } as const;
+        export type Status = (typeof Status)[keyof typeof Status];
     }
 }

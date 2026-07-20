@@ -4,7 +4,15 @@ export interface MarginPositionsEventsSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `positionsAccountMargin_subscribe`. */
-    method: "positionsAccountMargin_subscribe";
+    method: MarginPositionsEventsSubscribe.Method;
     /** Empty array */
     params: unknown[];
+}
+
+export namespace MarginPositionsEventsSubscribe {
+    /** Method name. Fixed value: `positionsAccountMargin_subscribe`. */
+    export const Method = {
+        PositionsAccountMarginSubscribe: "positionsAccountMargin_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

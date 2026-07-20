@@ -5,9 +5,33 @@
  *     {}
  */
 export interface GetOrderHistoryRequest {
+    /** Trading pair to filter by. Format: `BASE_QUOTE` (e.g., `BTC_USDT`). Omit to retrieve orders across all markets. */
     market?: string;
+    /** Look up a specific order by the custom client identifier. When supplied, the endpoint switches to single-order lookup mode and the `startDate`, `endDate`, and `status` filters are ignored. Returns `422` with `"OrderHistory was not found."` if no order matches. Ignored when `orderId` is also provided. */
+    clientOrderId?: string;
+    /** Look up a specific order by the exchange-assigned identifier. When supplied, the endpoint switches to single-order lookup mode and the `startDate`, `endDate`, and `status` filters are ignored. Returns an empty result on no match (no `422`). Takes precedence over `clientOrderId` when both are supplied. */
+    orderId?: number;
+    /** Filter list-mode results by order status. Ignored when `orderId` or `clientOrderId` is supplied. */
+    status?: GetOrderHistoryRequest.Status;
+    /** Start of the query window as a Unix timestamp in seconds. Default: `now - 1 month`. The earliest reachable date is 6 months ago (00:00 UTC) — requests with an older `startDate` are rejected with a validation error. */
+    startDate?: number;
+    /** End of the query window as a Unix timestamp in seconds. Default: `now`. Values greater than the current time are silently clamped to `now`. The maximum span between `startDate` and `endDate` is 31 days. */
+    endDate?: number;
+    /** Number of records to skip. Default: `0`. */
     offset?: number;
+    /** Maximum number of records to return. Default: `50`. Minimum: `1`. Maximum: `500`. */
     limit?: number;
     request?: string;
-    nonce?: string;
+    nonce?: number;
+}
+
+export namespace GetOrderHistoryRequest {
+    /** Filter list-mode results by order status. Ignored when `orderId` or `clientOrderId` is supplied. */
+    export const Status = {
+        All: "ALL",
+        Filled: "FILLED",
+        Canceled: "CANCELED",
+        PartiallyFilled: "PARTIALLY_FILLED",
+    } as const;
+    export type Status = (typeof Status)[keyof typeof Status];
 }

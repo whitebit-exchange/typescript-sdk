@@ -8,63 +8,87 @@
  *         amount: "0.001",
  *         price: "9800",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface LimitOrderRequest {
-    /** Available [market](/glossary#market). Example: BTC_USDT */
+    /** Trading pair. Format: `BASE_QUOTE` (e.g., `BTC_USDT`). Query `GET /api/v4/public/markets` for available markets. */
     market: string;
-    /** Order type. Variables: 'buy' / 'sell' Example: 'buy' */
+    /** Order side. Allowed values: `buy`, `sell`. */
     side: LimitOrderRequest.Side;
-    /** Amount of [stock](/glossary#stock) currency to buy or sell. Example: '0.001' or 0.001 */
+    /** Order quantity in base (stock) currency. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, `maxTotal`. Precision: `stockPrec`. */
     amount: string;
-    /** Price in money currency. Example: '9800' or 9800 */
+    /** Limit price per unit in quote (money) currency. Minimum and maximum values are market-dependent. Precision: `moneyPrec`. */
     price: string;
-    /** Identifier should be unique and contain letters, dashes, numbers, dots or underscores. The identifier must be unique. */
-    client_order_id?: string;
-    /** [Orders](/glossary#orders) are guaranteed to be the [maker](/glossary#maker) order when [executed](/glossary#finished-orders). Variables: 'true' / 'false' Example: 'false'. */
+    /** Custom client order identifier. Uniqueness is enforced only among the account's open (pending) orders on the same market — once a previous order is filled or canceled, the same identifier can be reused, including on the same market. Contains only letters, numbers, dashes, dots, or underscores. */
+    clientOrderId?: string;
+    /** Post-only flag. When `true`, the order executes only as a [maker](/glossary#maker) order and the system rejects the order if it would match immediately. Default: `false`. */
     postOnly?: boolean;
     /**
-     * Immediate-or-cancel (IOC) executes all or part of an order immediately and cancels any unfilled portion.
+     * Immediate-or-cancel (IOC) flag. When `true`, the matching engine executes all or part of the order immediately and cancels any unfilled portion. Default: `false`.
      *
      * IOC does not support `rpi=true` because RPI uses post-only behavior by design.
-     * The API returns error code `37` when a request sets both `ioc=true` and `rpi=true`.
+     * The API returns error code `40` when a request sets both `ioc=true` and `rpi=true`.
      *
      * Refer to [Order Parameter Rules](/guides/order-parameter-rules) for unsupported parameter combinations.
      */
     ioc?: boolean;
-    /** When the [BBO](/glossary#bbo) option is activated for Limit orders, the system selects the best market prices for execution. Variables: 1 - Queue Method / 2 - Counterparty Method. Use method 2 with ioc flag. Example: 2. */
+    /** Best Bid/Offer ([BBO](/glossary#bbo)) execution method. The system selects the best market price for execution. `1` = Queue method, `2` = Counterparty method. Use method `2` with the `ioc` flag. */
     bboRole?: number;
-    /** Self trade prevention mode. Variables: 'no' / 'cancel_both' / 'cancel_new' / 'cancel_old'. Example: 'no'. */
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
     stp?: LimitOrderRequest.Stp;
     /**
-     * Enables Retail Price Improvement (RPI) mode.
+     * Enables Retail Price Improvement (RPI) mode. Default: `false`.
      *
      * RPI orders use post-only behavior by design. An RPI order does not support `ioc=true`.
-     * The API returns error code `37` when a request sets both `rpi=true` and `ioc=true`.
+     * The API returns error code `40` when a request sets both `rpi=true` and `ioc=true`.
      * RPI orders do not appear in public order book feeds (`depth`, `bookTicker`). RPI orders are visible only in private active orders and in the exchange UI order book (web/mobile).
-     * RPI executions may apply custom fees or rebates, especially when trading via sub-accounts. Use Query Market Fee / Query All Market Fees to verify effective fees.
+     * RPI executions may apply custom fees or rebates, especially when trading via sub-accounts. Use Query Market Fees to verify effective fees.
      *
      * Refer to [Order Parameter Rules](/guides/order-parameter-rules) for unsupported parameter combinations.
      */
     rpi?: boolean;
+    /**
+     * Retail-source taker flag. When `true`, the order is eligible to match against orders submitted by RPI makers and may receive price improvement at execution. Default: `false`.
+     *
+     * The Retail flag must be enabled on the account before a private-API request can set `retail=true`. Contact the account manager to enable the Retail flag.
+     *
+     * The Retail flag cannot be combined with `rpi`. The API returns error code `41` when a request sets both `retail=true` and `rpi=true`.
+     *
+     * The flag has no effect on a `postOnly=true` order. Post-only orders are [makers](/glossary#maker); only takers carry the retail designation.
+     *
+     * Refer to [Retail flag](/glossary#retail-flag) and [Order Parameter Rules](/guides/order-parameter-rules) for unsupported parameter combinations.
+     */
+    retail?: boolean;
     request: string;
-    nonce: string;
+    nonce: number;
 }
 
 export namespace LimitOrderRequest {
-    /** Order type. Variables: 'buy' / 'sell' Example: 'buy' */
+    /** Order side. Allowed values: `buy`, `sell`. */
     export const Side = {
         Buy: "buy",
         Sell: "sell",
     } as const;
     export type Side = (typeof Side)[keyof typeof Side];
-    /** Self trade prevention mode. Variables: 'no' / 'cancel_both' / 'cancel_new' / 'cancel_old'. Example: 'no'. */
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
     export const Stp = {
         No: "no",
-        CancelBoth: "cancel_both",
-        CancelNew: "cancel_new",
-        CancelOld: "cancel_old",
+        Cb: "cb",
+        Cn: "cn",
+        Co: "co",
     } as const;
     export type Stp = (typeof Stp)[keyof typeof Stp];
 }

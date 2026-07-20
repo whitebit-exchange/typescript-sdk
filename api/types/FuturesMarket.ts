@@ -21,9 +21,9 @@ export interface FuturesMarket {
     high?: string | undefined;
     /** Rolling 24-hours lowest transaction price */
     low?: string | undefined;
-    /** What product is this? Futures, Perpetual, Options? */
-    product_type?: string | undefined;
-    /** The open interest in the last 24 hours in contracts */
+    /** Derivative product type for the market. */
+    product_type?: FuturesMarket.ProductType | undefined;
+    /** Current open interest in contracts (point-in-time snapshot, not a 24-hour delta or volume). */
     open_interest?: string | undefined;
     /** Underlying index price */
     index_price?: string | undefined;
@@ -31,14 +31,24 @@ export interface FuturesMarket {
     index_name?: string | undefined;
     /** Underlying currency for index */
     index_currency?: string | undefined;
-    /** The current funding rate, which may fluctuate due to market conditions */
+    /** Predicted funding rate for the next settlement interval. Fluctuates in real time until settlement occurs. See GET /api/v4/public/funding-history/{market} for historical funding rate records. */
     funding_rate?: string | undefined;
-    /** Timestamp of the next funding rate change */
+    /** Unix timestamp in milliseconds of the next funding settlement. 13-digit value (millisecond precision). */
     next_funding_rate_timestamp?: string | undefined;
-    /** Brackets */
+    /** Leverage brackets defining position size limits. Object keys are leverage multipliers (e.g., "1", "2", "5", "10", "20", "50", "100"). Values are the maximum allowed open position size in USDT equivalent at the corresponding leverage level. */
     brackets?: Record<string, number> | undefined;
-    /** Max Leverage */
+    /** Maximum leverage multiplier allowed for the market. */
     max_leverage?: number | undefined;
     /** Funding interval in minutes */
     funding_interval_minutes?: number | undefined;
+}
+
+export namespace FuturesMarket {
+    /** Derivative product type for the market. */
+    export const ProductType = {
+        Perpetual: "Perpetual",
+        Futures: "Futures",
+        Options: "Options",
+    } as const;
+    export type ProductType = (typeof ProductType)[keyof typeof ProductType];
 }

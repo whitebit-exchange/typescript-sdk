@@ -5,6 +5,14 @@ import type * as WhitebitApi from "../index.js";
 export interface CandlesUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `candles_update`. */
-    method: "candles_update";
+    method: CandlesUpdate.Method;
     params: WhitebitApi.Candle[];
+}
+
+export namespace CandlesUpdate {
+    /** Method name. Fixed value: `candles_update`. */
+    export const Method = {
+        CandlesUpdate: "candles_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

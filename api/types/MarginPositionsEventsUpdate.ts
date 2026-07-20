@@ -4,11 +4,19 @@ export interface MarginPositionsEventsUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `positionsAccountMargin_update`. */
-    method: "positionsAccountMargin_update";
+    method: MarginPositionsEventsUpdate.Method;
     /**
      * Event tuple:
      * - [0] Event type (1=Margin call, 2=Liquidation)
      * - [1] Position object with all position details
      */
     params: unknown[];
+}
+
+export namespace MarginPositionsEventsUpdate {
+    /** Method name. Fixed value: `positionsAccountMargin_update`. */
+    export const Method = {
+        PositionsAccountMarginUpdate: "positionsAccountMargin_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

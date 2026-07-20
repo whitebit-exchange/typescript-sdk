@@ -5,16 +5,16 @@
  *     {}
  */
 export interface GetActiveOrdersRequest {
-    /** Available [market](/glossary#market). Example: BTC_USDT */
+    /** Trading pair to filter by. Format: `BASE_QUOTE` (e.g., `BTC_USDT`). Omit to retrieve orders across all markets. */
     market?: string;
-    /** Available order_id. Example: 3134995325 */
-    order_id?: number;
-    /** Available client_order_id. Example: customId11 */
-    client_order_id?: string;
-    /** Starting line index (OFFSET). Default: 0, Min: 0 */
+    /** Filter by a specific order identifier. Returns only the matching active order. */
+    orderId?: number;
+    /** Filter by custom client order identifier. Returns only the matching active order. */
+    clientOrderId?: string;
+    /** Number of records to skip. Default: `0`. Maximum: `4294967295`. */
     offset?: number;
-    /** LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 100 */
+    /** Maximum number of records to return. Default: `50`. Minimum: `1`. Maximum: `100`. */
     limit?: number;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

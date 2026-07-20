@@ -4,11 +4,19 @@ export interface MarketRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `market_request`. */
-    method: "market_request";
+    method: MarketRequest.Method;
     /**
      * Query parameters:
      * - [0] Market name
      * - [1] Period in seconds
      */
     params: unknown[];
+}
+
+export namespace MarketRequest {
+    /** Method name. Fixed value: `market_request`. */
+    export const Method = {
+        MarketRequest: "market_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

@@ -11,7 +11,7 @@ export interface ConvertEstimateResponse {
     give?: string | undefined;
     /** Amount to receive */
     receive?: string | undefined;
-    /** Conversion rate */
+    /** Conversion rate expressed in the from→to direction: units of the 'to' currency received per one unit of the 'from' currency. Example: if from=BTC and to=USDT, a rate of "34299.76" means 1 BTC is worth approximately 34 299.76 USDT at the time of the quote. */
     rate?: string | undefined;
     /** Quote expiration timestamp */
     expireAt?: number | undefined;

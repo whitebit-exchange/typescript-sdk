@@ -8,39 +8,51 @@
  *         amount: "0.01",
  *         activation_price: "10000",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface StopMarketOrderRequest {
-    /** Available [market](/glossary#market). Example: BTC_USDT */
+    /** Trading pair. Format: `BASE_QUOTE` (e.g., `BTC_USDT`). Query `GET /api/v4/public/markets` for available markets. */
     market: string;
-    /** Order type. Variables: 'buy' / 'sell' Example: 'buy' */
+    /** Order side. Allowed values: `buy`, `sell`. */
     side: StopMarketOrderRequest.Side;
-    /** Amount of [money](/glossary#money) currency to buy or amount in [stock](/glossary#stock) currency to sell. Example: '0.01' or 0.01 for buy and '0.0001' for sell. */
+    /** For buy orders: total in quote (money) currency to spend. For sell orders: quantity in base (stock) currency to sell. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, `maxTotal`. */
     amount: string;
-    /** Activation price in [money](/glossary#money) currency. Example: '10000' or 10000 */
+    /** Trigger price in quote (money) currency. For buy orders, the stop triggers when the market price rises to or above the specified price. For sell orders, the stop triggers when the market price falls to or below the specified price. Precision: `moneyPrec`. */
     activation_price: string;
-    /** Identifier should be unique and contain letters, dashes, numbers, dots or underscores. The identifier must be unique. */
-    client_order_id?: string;
-    /** Self trade prevention mode. Variables: 'no' / 'cancel_both' / 'cancel_new' / 'cancel_old'. Example: 'no'. */
+    /** Custom client order identifier. Uniqueness is enforced only among the account's open (pending) orders on the same market — once a previous order is filled or canceled, the same identifier can be reused, including on the same market. Contains only letters, numbers, dashes, dots, or underscores. */
+    clientOrderId?: string;
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
     stp?: StopMarketOrderRequest.Stp;
     request: string;
-    nonce: string;
+    nonce: number;
 }
 
 export namespace StopMarketOrderRequest {
-    /** Order type. Variables: 'buy' / 'sell' Example: 'buy' */
+    /** Order side. Allowed values: `buy`, `sell`. */
     export const Side = {
         Buy: "buy",
         Sell: "sell",
     } as const;
     export type Side = (typeof Side)[keyof typeof Side];
-    /** Self trade prevention mode. Variables: 'no' / 'cancel_both' / 'cancel_new' / 'cancel_old'. Example: 'no'. */
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
     export const Stp = {
         No: "no",
-        CancelBoth: "cancel_both",
-        CancelNew: "cancel_new",
-        CancelOld: "cancel_old",
+        Cb: "cb",
+        Cn: "cn",
+        Co: "co",
     } as const;
     export type Stp = (typeof Stp)[keyof typeof Stp];
 }

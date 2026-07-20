@@ -24,7 +24,7 @@ export interface ConvertEstimateRequest {
     to: string;
     /** Convert amount direction, defines in which currency corresponding "amount" field is populated. Use "to" in case amount is in "to" currency, use "from" if amount is in "from" currency */
     direction: ConvertEstimateRequest.Direction;
-    /** Amount to convert or receive. */
+    /** Amount to convert or receive. The value is silently truncated to 8 decimal places before evaluation; excess decimals do not raise an error. */
     amount: string;
     /** Nonce for request */
     nonce?: number;

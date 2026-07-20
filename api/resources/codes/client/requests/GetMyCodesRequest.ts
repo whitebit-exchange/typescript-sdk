@@ -4,7 +4,7 @@
  * @example
  *     {
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetMyCodesRequest {
@@ -15,5 +15,5 @@ export interface GetMyCodesRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

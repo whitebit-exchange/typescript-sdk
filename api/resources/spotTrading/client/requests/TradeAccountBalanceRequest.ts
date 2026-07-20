@@ -8,5 +8,5 @@ export interface TradeAccountBalanceRequest {
     /** Currency's [ticker](/glossary#ticker). Example: BTC */
     ticker?: string;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

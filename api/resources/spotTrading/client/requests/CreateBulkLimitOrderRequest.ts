@@ -12,8 +12,9 @@ import type * as WhitebitApi from "../../../../index.js";
  *                 market: "BTC_USDT",
  *                 postOnly: false,
  *                 ioc: false,
- *                 client_order_id: "",
- *                 rpi: true
+ *                 clientOrderId: "",
+ *                 rpi: true,
+ *                 retail: false
  *             }, {
  *                 side: "sell",
  *                 amount: "0.0001",
@@ -21,8 +22,9 @@ import type * as WhitebitApi from "../../../../index.js";
  *                 market: "BTC_USDT",
  *                 postOnly: false,
  *                 ioc: false,
- *                 client_order_id: "",
- *                 rpi: true
+ *                 clientOrderId: "",
+ *                 rpi: false,
+ *                 retail: true
  *             }, {
  *                 side: "sell",
  *                 amount: "0.02",
@@ -30,8 +32,9 @@ import type * as WhitebitApi from "../../../../index.js";
  *                 market: "BTC_USDT",
  *                 postOnly: false,
  *                 ioc: false,
- *                 client_order_id: "",
- *                 rpi: true
+ *                 clientOrderId: "",
+ *                 rpi: false,
+ *                 retail: false
  *             }]
  *     }
  */
@@ -47,5 +50,5 @@ export interface CreateBulkLimitOrderRequest {
      */
     stopOnFail?: boolean;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

@@ -1,9 +1,12 @@
 export type { BlockSubAccountRequest } from "./BlockSubAccountRequest.js";
+export type { ConfirmSubAccountWithdrawalRequest } from "./ConfirmSubAccountWithdrawalRequest.js";
 export type { CreateSubAccountRequest } from "./CreateSubAccountRequest.js";
 export type { DeleteSubAccountRequest } from "./DeleteSubAccountRequest.js";
 export type { EditSubAccountRequest } from "./EditSubAccountRequest.js";
 export type { GetSubAccountBalancesRequest } from "./GetSubAccountBalancesRequest.js";
+export type { GetSubAccountKycUrlRequest } from "./GetSubAccountKycUrlRequest.js";
 export { GetSubAccountTransferHistoryRequest } from "./GetSubAccountTransferHistoryRequest.js";
 export type { ListSubAccountsRequest } from "./ListSubAccountsRequest.js";
+export type { ListUnconfirmedSubAccountWithdrawalsRequest } from "./ListUnconfirmedSubAccountWithdrawalsRequest.js";
 export { SubAccountTransferRequest } from "./SubAccountTransferRequest.js";
 export type { UnblockSubAccountRequest } from "./UnblockSubAccountRequest.js";

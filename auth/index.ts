@@ -1,2 +1,2 @@
-export { BearerAuthProvider } from "./BearerAuthProvider.js";
+export { HeaderAuthProvider } from "./HeaderAuthProvider.js";
 export { createHmacFetch } from "./hmac.js";

@@ -7,35 +7,38 @@ export interface GetApiV4PublicMarketsResponseItem {
     stock: string;
     /** Ticker of money currency */
     money: string;
-    /** Stock currency precision */
+    /** Maximum number of decimal places for the base (stock) currency quantity. Represented as a stringified integer. */
     stockPrec: string;
-    /** Precision of money currency */
+    /** Maximum number of decimal places for the quote (money) currency amount. Represented as a stringified integer. */
     moneyPrec: string;
-    /** Fee precision */
+    /** Maximum number of decimal places used when calculating fees. Represented as a stringified integer. */
     feePrec: string;
-    /** Default maker fee ratio */
+    /** Default maker fee as a decimal ratio (e.g., `"0.001"` = 0.1%). Multiply by 100 to convert to a percentage. */
     makerFee: string;
-    /** Default taker fee ratio */
+    /** Default taker fee as a decimal ratio (e.g., `"0.001"` = 0.1%). Multiply by 100 to convert to a percentage. */
     takerFee: string;
-    /** Minimal amount of stock to trade */
+    /** Minimum order quantity in the base (stock) currency. */
     minAmount: string;
-    /** Minimal amount of money to trade */
+    /** Minimum order total in the quote (money) currency. */
     minTotal: string;
-    /** Maximum total (amount * price) of money to trade */
-    maxTotal?: string | undefined;
+    /** Maximum order total (quantity × price) in the quote (money) currency. `"0"` indicates no upper limit. */
+    maxTotal: string;
     /** Indicates whether trading is enabled */
     tradesEnabled: boolean;
     /** Indicates whether margin trading is enabled */
-    isCollateral?: boolean | undefined;
-    /** Market type. Possible values: spot, futures */
+    isCollateral: boolean;
+    /** Market type. Possible values: spot, futures, tradfiFutures */
     type: GetApiV4PublicMarketsResponseItem.Type;
+    /** Indicates whether the market is a traditional-finance (TradFi) futures market. Always paired with `type: tradfiFutures`. TradFi futures markets are region-gated and are omitted from the response entirely where not available. */
+    isTradFiFutures: boolean;
 }
 
 export namespace GetApiV4PublicMarketsResponseItem {
-    /** Market type. Possible values: spot, futures */
+    /** Market type. Possible values: spot, futures, tradfiFutures */
     export const Type = {
         Spot: "spot",
         Futures: "futures",
+        TradfiFutures: "tradfiFutures",
     } as const;
     export type Type = (typeof Type)[keyof typeof Type];
 }

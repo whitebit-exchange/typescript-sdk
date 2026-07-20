@@ -4,7 +4,7 @@ export interface CandlesRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `candles_request`. */
-    method: "candles_request";
+    method: CandlesRequest.Method;
     /**
      * Query parameters:
      * - [0] Market name (e.g., ETH_BTC)
@@ -13,4 +13,12 @@ export interface CandlesRequest {
      * - [3] Interval in seconds
      */
     params: unknown[];
+}
+
+export namespace CandlesRequest {
+    /** Method name. Fixed value: `candles_request`. */
+    export const Method = {
+        CandlesRequest: "candles_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

@@ -14,27 +14,27 @@ export namespace GetOrderDealsResponse {
 
     export namespace Records {
         export interface Item {
-            /** Timestamp of executed order */
+            /** Unix timestamp of the deal execution, with microsecond precision. */
             time?: number | undefined;
-            /** Fee paid */
+            /** Fee charged for the deal, denominated in the asset specified by `feeAsset`. */
             fee?: string | undefined;
-            /** Deal price */
+            /** Execution price per unit in quote currency. */
             price?: string | undefined;
-            /** Amount in stock */
+            /** Executed quantity in base (stock) currency. */
             amount?: string | undefined;
-            /** Deal identifier */
+            /** Unique deal identifier assigned by the matching engine. */
             id?: number | undefined;
-            /** Completed order identifier */
+            /** Identifier of the counterparty order that matched against the queried order. */
             dealOrderId?: number | undefined;
-            /** Custom order identifier. Empty string if not specified */
-            client_order_id?: string | undefined;
-            /** Role in the deal (1 - maker, 2 - taker) */
+            /** Custom order identifier supplied in the original order request. Returns an empty string when not specified. */
+            clientOrderId?: string | undefined;
+            /** Execution role in the deal. `1` = maker (order was resting on the book), `2` = taker (order matched immediately). */
             role?: number | undefined;
-            /** Amount in money */
+            /** Total deal value in quote (money) currency. Equals `amount * price`. */
             deal?: string | undefined;
-            /** Fee asset */
+            /** Currency ticker of the asset used to pay the trading fee. */
             feeAsset?: string | undefined;
-            /** Retail Price Improvement flag */
+            /** Retail Price Improvement flag. `true` when the deal executed under RPI pricing. */
             rpi?: boolean | undefined;
         }
     }

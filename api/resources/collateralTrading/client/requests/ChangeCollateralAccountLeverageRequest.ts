@@ -5,11 +5,12 @@
  *     {
  *         leverage: 5,
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface ChangeCollateralAccountLeverageRequest {
+    /** Target leverage level. Accepted values: `1`, `2`, `3`, `5`, `10`, `20`, `50`, `100`. The effective maximum depends on the market's `max_leverage`. */
     leverage: number;
     request: string;
-    nonce: string;
+    nonce: number;
 }

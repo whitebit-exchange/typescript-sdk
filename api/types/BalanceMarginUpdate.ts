@@ -4,12 +4,17 @@ export interface BalanceMarginUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `balanceMargin_update`. */
-    method: "balanceMargin_update";
+    method: BalanceMarginUpdate.Method;
     /** Array containing margin balance updates with abbreviated field names */
     params: BalanceMarginUpdate.Params.Item[];
 }
 
 export namespace BalanceMarginUpdate {
+    /** Method name. Fixed value: `balanceMargin_update`. */
+    export const Method = {
+        BalanceMarginUpdate: "balanceMargin_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
     export type Params = Params.Item[];
 
     export namespace Params {

@@ -3,7 +3,7 @@
 export interface TransactionHistory {
     /** Deposit/Withdraw address */
     address?: string | undefined;
-    /** Unique Id of deposit/withdraw */
+    /** Unique Id of deposit/withdraw. Unique per user. */
     unique_id?: (string | null) | undefined;
     /** Timestamp of deposit/withdraw */
     createdAt?: number | undefined;
@@ -25,9 +25,9 @@ export interface TransactionHistory {
     status?: number | undefined;
     /** Network if currency is multinetwork */
     network?: (string | null) | undefined;
-    /** Deposit/Withdraw transaction hash */
+    /** Deposit/Withdraw transaction hash. A single hash can map to multiple records (e.g. several outputs to a WhiteBIT address in one on-chain transaction); use `transaction_id` to distinguish them. */
     transactionHash?: string | undefined;
-    /** Transaction ID */
+    /** Transaction UUID. Unique across the whole system and never reused. */
     transaction_id?: string | undefined;
     /** Additional details for the transaction */
     details?: (Record<string, unknown> | null) | undefined;

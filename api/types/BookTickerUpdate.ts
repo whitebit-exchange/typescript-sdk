@@ -5,6 +5,14 @@ import type * as WhitebitApi from "../index.js";
 export interface BookTickerUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `bookTicker_update`. */
-    method: "bookTicker_update";
+    method: BookTickerUpdate.Method;
     params: WhitebitApi.BookTickerUpdateData[];
+}
+
+export namespace BookTickerUpdate {
+    /** Method name. Fixed value: `bookTicker_update`. */
+    export const Method = {
+        BookTickerUpdate: "bookTicker_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

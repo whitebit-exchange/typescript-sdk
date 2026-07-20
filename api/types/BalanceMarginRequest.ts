@@ -4,7 +4,15 @@ export interface BalanceMarginRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `balanceMargin_request`. */
-    method: "balanceMargin_request";
+    method: BalanceMarginRequest.Method;
     /** Array of asset tickers to query */
     params: string[];
+}
+
+export namespace BalanceMarginRequest {
+    /** Method name. Fixed value: `balanceMargin_request`. */
+    export const Method = {
+        BalanceMarginRequest: "balanceMargin_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

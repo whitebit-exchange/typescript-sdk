@@ -7,16 +7,16 @@
 export interface GetExecutedOrderHistoryRequest {
     /** Requested [market](/glossary#market). Example: BTC_USDT */
     market?: string;
-    /** Filter by custom order identifier */
-    client_order_id?: string;
+    /** Look up by custom client order identifier. When supplied, the endpoint switches to single-order lookup mode and returns the matching order's deal history. Returns `422` with `"OrderHistory was not found."` if no order matches on the calling account. */
+    clientOrderId?: string;
     /** Start date in Unix-time format */
     startDate?: number;
     /** End date in Unix-time format */
     endDate?: number;
     /** Starting line index (OFFSET). Default: 0, Min: 0 */
     offset?: number;
-    /** LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 100 */
+    /** LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 500 */
     limit?: number;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

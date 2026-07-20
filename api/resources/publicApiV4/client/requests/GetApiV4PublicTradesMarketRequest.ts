@@ -11,6 +11,6 @@ import type * as WhitebitApi from "../../../../index.js";
 export interface GetApiV4PublicTradesMarketRequest {
     /** Market pair name */
     market: string;
-    /** Can be buy or sell */
+    /** Filter by trade side. Omit to return both buy and sell trades. */
     type?: WhitebitApi.GetApiV4PublicTradesMarketRequestType;
 }

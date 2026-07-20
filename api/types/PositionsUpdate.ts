@@ -4,11 +4,17 @@ export interface PositionsUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `positionsMargin_update`. */
-    method: "positionsMargin_update";
+    method: PositionsUpdate.Method;
     params: PositionsUpdate.Params;
 }
 
 export namespace PositionsUpdate {
+    /** Method name. Fixed value: `positionsMargin_update`. */
+    export const Method = {
+        PositionsMarginUpdate: "positionsMargin_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
+
     export interface Params {
         /** Positions count */
         total?: number | undefined;

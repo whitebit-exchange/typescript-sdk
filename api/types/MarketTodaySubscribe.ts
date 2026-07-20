@@ -3,6 +3,14 @@
 export interface MarketTodaySubscribe {
     id: number;
     /** Method name. Fixed value: `marketToday_subscribe`. */
-    method: "marketToday_subscribe";
+    method: MarketTodaySubscribe.Method;
     params: string[];
+}
+
+export namespace MarketTodaySubscribe {
+    /** Method name. Fixed value: `marketToday_subscribe`. */
+    export const Method = {
+        MarketTodaySubscribe: "marketToday_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

@@ -4,7 +4,15 @@ export interface OrdersPendingSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `ordersPending_subscribe`. */
-    method: "ordersPending_subscribe";
+    method: OrdersPendingSubscribe.Method;
     /** Array of markets to subscribe to */
     params: string[];
+}
+
+export namespace OrdersPendingSubscribe {
+    /** Method name. Fixed value: `ordersPending_subscribe`. */
+    export const Method = {
+        OrdersPendingSubscribe: "ordersPending_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

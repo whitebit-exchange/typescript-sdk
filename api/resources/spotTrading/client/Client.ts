@@ -26,7 +26,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint retrieves the [trade balance](/glossary#balance-spotbalance-trade) by currency [ticker](/glossary#ticker) or all balances.
+     * The endpoint retrieves the [trade balance](/glossary#balance-spotbalance-trade) by currency [ticker](/glossary#ticker) or all balances. When the `ticker` parameter is provided, the response contains a single currency entry. When omitted, the response contains all currencies with non-zero balances. Each entry includes the `available` balance (funds ready to trade) and the `freeze` balance (funds locked in open orders).
      *
      * <Warning>
      * Rate limit: 12000 requests/10 sec.
@@ -89,7 +89,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -152,7 +155,14 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates [limit trading order](/glossary#limit-order).
+     * The endpoint creates a [limit trading order](/glossary#limit-order). The order remains on the order book until filled, cancelled, or expired. Minimum and maximum values for `amount` and `price` are market-dependent — query `GET /api/v4/public/markets` for per-market constraints.
+     *
+     * **Order validation rules** (per-market, from `GET /api/v4/public/markets`):
+     * - `amount` must have at most `stockPrec` decimal places
+     * - `price` must have at most `moneyPrec` decimal places
+     * - `amount` must be ≥ `minAmount`
+     * - `amount × price` must be ≥ `minTotal`
+     * - `amount × price` must be ≤ `maxTotal` (when `maxTotal` is not `"0"`)
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -160,7 +170,10 @@ export class SpotTradingClient {
      *
      * <Note>
      *   - RPI orders do not appear in public order book feeds (`depth`, `bookTicker`). RPI orders are visible only in private active orders and in the exchange UI order book (web/mobile).
-     *   - RPI orders are post-only by design and cannot be used with the IOC flag. The API returns error code `37` when both `rpi=true` and `ioc=true` are used.
+     *   - RPI orders are post-only by design and cannot be used with the IOC flag. The API returns error code `40` when both `rpi=true` and `ioc=true` are used.
+     *   - `retail=true` marks the order as a retail-source taker eligible to match RPI-maker liquidity. The Retail flag must be enabled on the account; contact the account manager to enable it.
+     *   - `retail=true` and `rpi=true` cannot be combined. The API returns error code `41` when both flags are set.
+     *   - `retail=true` has no effect on a `postOnly=true` order. Post-only orders are makers and cannot be retail takers.
      * </Note>
      *
      * <Accordion title="Error Codes">
@@ -168,8 +181,12 @@ export class SpotTradingClient {
      *   - `31` - market validation failed
      *   - `32` - amount validation failed
      *   - `33` - price validation failed
-     *   - `36` - client_order_id validation failed
-     *   - `37` - `ioc=true` cannot be used with `postOnly=true` or `rpi=true`
+     *   - `36` - clientOrderId validation failed
+     *   - `37` - `ioc=true` cannot be combined with `postOnly=true`
+     *   - `40` - `ioc=true` cannot be combined with `rpi=true`
+     *   - `41` - `retail=true` cannot be combined with `rpi=true`
+     *   - `42` - `retail=true` is not allowed for the account
+     *   - `43` - `rpi=true` is not allowed for the account
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -254,7 +271,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": ["ClientOrderId field should be a string."]
+     *     "clientOrderId": ["ClientOrderId field should be a string."]
      *   }
      * }
      * ```
@@ -264,7 +281,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": [
+     *     "clientOrderId": [
      *       "ClientOrderId field should contain only latin letters, numbers and dashes."
      *     ]
      *   }
@@ -276,7 +293,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": [
+     *     "clientOrderId": [
      *       "This client order id is already used by the current account."
      *     ]
      *   }
@@ -344,6 +361,26 @@ export class SpotTradingClient {
      *   }
      * }
      * ```
+     *
+     * ```json
+     * {
+     *   "code": 41,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "retail": ["api.tradeErrors.flagsCantBeCombined.rpiRetail"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 42,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "retail": ["api.validation.retail.not_allowed"]
+     *   }
+     * }
+     * ```
      * </Accordion>
      *
      * @param {WhitebitApi.LimitOrderRequest} request
@@ -360,7 +397,7 @@ export class SpotTradingClient {
      *         amount: "0.001",
      *         price: "9800",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createLimitOrder(
@@ -378,7 +415,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -433,7 +473,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates bulk [limit trading orders](/glossary#limit-order).
+     * The endpoint creates bulk [limit trading orders](/glossary#limit-order). Each order in the batch follows the same validation rules as a single limit order. The `stopOnFail` parameter controls whether processing stops at the first failure or continues through all orders. The response contains a result-or-error pair for each submitted order.
      *
      * <Warning>
      *   Limit: From 1 to 20 orders per request.
@@ -441,7 +481,10 @@ export class SpotTradingClient {
      *
      * <Note>
      *   - RPI orders do not appear in public order book feeds (`depth`, `bookTicker`). RPI orders are visible only in private active orders and in the exchange UI order book (web/mobile).
-     *   - RPI orders are post-only by design and cannot be used with the IOC flag. The API returns error code `37` when both `rpi=true` and `ioc=true` are used.
+     *   - RPI orders are post-only by design and cannot be used with the IOC flag. The API returns error code `40` when both `rpi=true` and `ioc=true` are used.
+     *   - `retail=true` marks the order as a retail-source taker eligible to match RPI-maker liquidity. The Retail flag must be enabled on the account; contact the account manager to enable it.
+     *   - `retail=true` and `rpi=true` cannot be combined. The API returns error code `41` when both flags are set on an item.
+     *   - `retail=true` has no effect on a `postOnly=true` item. Post-only orders are makers and cannot be retail takers.
      * </Note>
      *
      *
@@ -450,8 +493,12 @@ export class SpotTradingClient {
      *   - `31` - market validation failed
      *   - `32` - amount validation failed
      *   - `33` - price validation failed
-     *   - `36` - client_order_id validation failed
-     *   - `37` - `ioc=true` cannot be used with `postOnly=true` or `rpi=true`
+     *   - `36` - clientOrderId validation failed
+     *   - `37` - `ioc=true` cannot be combined with `postOnly=true`
+     *   - `40` - `ioc=true` cannot be combined with `rpi=true`
+     *   - `41` - `retail=true` cannot be combined with `rpi=true`
+     *   - `42` - `retail=true` is not allowed for the account
+     *   - `43` - `rpi=true` is not allowed for the account
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -509,6 +556,26 @@ export class SpotTradingClient {
      *   }
      * }
      * ```
+     *
+     * ```json
+     * {
+     *   "code": 41,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "retail": ["api.tradeErrors.flagsCantBeCombined.rpiRetail"]
+     *   }
+     * }
+     * ```
+     *
+     * ```json
+     * {
+     *   "code": 42,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "retail": ["api.validation.retail.not_allowed"]
+     *   }
+     * }
+     * ```
      * </Accordion>
      *
      * @param {WhitebitApi.CreateBulkLimitOrderRequest} request
@@ -527,8 +594,9 @@ export class SpotTradingClient {
      *                 market: "BTC_USDT",
      *                 postOnly: false,
      *                 ioc: false,
-     *                 client_order_id: "",
-     *                 rpi: true
+     *                 clientOrderId: "",
+     *                 rpi: true,
+     *                 retail: false
      *             }, {
      *                 side: "sell",
      *                 amount: "0.0001",
@@ -536,8 +604,9 @@ export class SpotTradingClient {
      *                 market: "BTC_USDT",
      *                 postOnly: false,
      *                 ioc: false,
-     *                 client_order_id: "",
-     *                 rpi: true
+     *                 clientOrderId: "",
+     *                 rpi: false,
+     *                 retail: true
      *             }, {
      *                 side: "sell",
      *                 amount: "0.02",
@@ -545,8 +614,9 @@ export class SpotTradingClient {
      *                 market: "BTC_USDT",
      *                 postOnly: false,
      *                 ioc: false,
-     *                 client_order_id: "",
-     *                 rpi: true
+     *                 clientOrderId: "",
+     *                 rpi: false,
+     *                 retail: false
      *             }]
      *     })
      */
@@ -565,7 +635,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -620,7 +693,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates [market trading order](/glossary#market-order).
+     * The endpoint creates a [market trading order](/glossary#market-order). The matching engine executes the order immediately at the best available price. For buy orders, `amount` represents the total in quote (money) currency to spend. For sell orders, `amount` represents the quantity in base (stock) currency to sell. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, and `maxTotal`.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -630,7 +703,7 @@ export class SpotTradingClient {
      * - `30` - default validation error code
      * - `31` - market validation failed
      * - `32` - amount validation failed
-     * - `36` - client_order_id validation failed
+     * - `36` - clientOrderId validation failed
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -714,7 +787,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": ["ClientOrderId field should be a string."]
+     *     "clientOrderId": ["ClientOrderId field should be a string."]
      *   }
      * }
      * ```
@@ -724,7 +797,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": [
+     *     "clientOrderId": [
      *       "ClientOrderId field should contain only latin letters, numbers and dashes."
      *     ]
      *   }
@@ -745,7 +818,7 @@ export class SpotTradingClient {
      *         side: "buy",
      *         amount: "100",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createMarketOrder(
@@ -763,7 +836,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -818,7 +894,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates buy [stock](/glossary#stock) market trading [order](/glossary#orders).
+     * The endpoint creates a [stock](/glossary#stock) market trading [order](/glossary#orders). Unlike `POST /api/v4/order/market`, the `amount` parameter always represents the quantity in the base (stock) currency for both buy and sell sides. The matching engine executes the order immediately at the best available price. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, and `maxTotal`.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -828,7 +904,7 @@ export class SpotTradingClient {
      * - `30` - default validation error code
      * - `31` - market validation failed
      * - `32` - amount validation failed
-     * - `36` - client_order_id validation failed
+     * - `36` - clientOrderId validation failed
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -912,13 +988,13 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": ["ClientOrderId field should be a string."]
+     *     "clientOrderId": ["ClientOrderId field should be a string."]
      *   }
      * }
      * ```
      * </Accordion>
      *
-     * @param {WhitebitApi.MarketOrderRequest} request
+     * @param {WhitebitApi.StockMarketOrderRequest} request
      * @param {SpotTradingClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
@@ -929,27 +1005,30 @@ export class SpotTradingClient {
      *     await client.spotTrading.createStockMarketOrder({
      *         market: "BTC_USDT",
      *         side: "buy",
-     *         amount: "100",
+     *         amount: "0.001",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createStockMarketOrder(
-        request: WhitebitApi.MarketOrderRequest,
+        request: WhitebitApi.StockMarketOrderRequest,
         requestOptions?: SpotTradingClient.RequestOptions,
     ): core.HttpResponsePromise<WhitebitApi.OrderResponse> {
         return core.HttpResponsePromise.fromPromise(this.__createStockMarketOrder(request, requestOptions));
     }
 
     private async __createStockMarketOrder(
-        request: WhitebitApi.MarketOrderRequest,
+        request: WhitebitApi.StockMarketOrderRequest,
         requestOptions?: SpotTradingClient.RequestOptions,
     ): Promise<core.WithRawResponse<WhitebitApi.OrderResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1004,7 +1083,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates [stop-limit trading order](/glossary#stop-limit-order).
+     * The endpoint creates a [stop-limit trading order](/glossary#stop-limit-order). The order remains inactive until the market price reaches the `activation_price`, at which point the system places a limit order at the specified `price`. For buy orders, activation triggers when the market price rises to or above `activation_price`. For sell orders, activation triggers when the market price falls to or below `activation_price`. Minimum and maximum values for `amount`, `price`, and `activation_price` are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, `maxTotal`, `stockPrec` (amount precision), and `moneyPrec` (price precision).
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -1015,7 +1094,7 @@ export class SpotTradingClient {
      * - `31` - market validation failed
      * - `32` - amount validation failed
      * - `33` - price validation failed
-     * - `36` - client_order_id validation failed
+     * - `36` - clientOrderId validation failed
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -1121,7 +1200,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": ["ClientOrderId field should be a string."]
+     *     "clientOrderId": ["ClientOrderId field should be a string."]
      *   }
      * }
      * ```
@@ -1131,7 +1210,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": [
+     *     "clientOrderId": [
      *       "ClientOrderId field should contain only latin letters, numbers and dashes."
      *     ]
      *   }
@@ -1154,7 +1233,7 @@ export class SpotTradingClient {
      *         price: "9800",
      *         activation_price: "10000",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createStopLimitOrder(
@@ -1172,7 +1251,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1227,7 +1309,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates [stop-market trading order](/glossary#stop-market-order).
+     * The endpoint creates a [stop-market trading order](/glossary#stop-market-order). The order remains inactive until the market price reaches the `activation_price`, at which point the system executes a market order immediately at the best available price. For buy orders, `amount` represents the total in quote currency and activation triggers when the market price rises to or above `activation_price`. For sell orders, `amount` represents the quantity in base currency and activation triggers when the market price falls to or below `activation_price`. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, and `maxTotal`.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -1237,7 +1319,7 @@ export class SpotTradingClient {
      * - `30` - default validation error code
      * - `31` - market validation failed
      * - `32` - amount validation failed
-     * - `36` - client_order_id validation failed
+     * - `36` - clientOrderId validation failed
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -1322,7 +1404,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": ["ClientOrderId field should be a string."]
+     *     "clientOrderId": ["ClientOrderId field should be a string."]
      *   }
      * }
      * ```
@@ -1332,7 +1414,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": [
+     *     "clientOrderId": [
      *       "ClientOrderId field should contain only latin letters, numbers and dashes."
      *     ]
      *   }
@@ -1344,7 +1426,7 @@ export class SpotTradingClient {
      *   "code": 36,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "client_order_id": [
+     *     "clientOrderId": [
      *       "This client order id is already used by the current account."
      *     ]
      *   }
@@ -1375,7 +1457,7 @@ export class SpotTradingClient {
      *         amount: "0.01",
      *         activation_price: "10000",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public createStopMarketOrder(
@@ -1393,7 +1475,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1446,15 +1531,15 @@ export class SpotTradingClient {
     }
 
     /**
-     * Cancel existing [order](/glossary#orders).
+     * The endpoint cancels an existing [order](/glossary#orders). Provide either `orderId` or `clientOrderId` to identify the target order. The response returns the final state of the cancelled order.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
      * </Warning>
      *
      * <Note>
-     * - Modification by client_order_id takes priority over order_id.
-     * - The request supports working only with order_id or only with client_order_id.
+     * - Cancellation by clientOrderId takes priority over orderId.
+     * - The request supports working only with orderId or only with clientOrderId.
      * - Do not pass both values at the same time.
      * </Note>
      *
@@ -1470,7 +1555,7 @@ export class SpotTradingClient {
      *   "message": "Validation failed",
      *   "errors": {
      *     "market": ["Market field is required."],
-     *     "order_id": ["OrderId field is required."]
+     *     "orderId": ["OrderId field is required."]
      *   }
      * }
      * ```
@@ -1500,7 +1585,7 @@ export class SpotTradingClient {
      *   "code": 30,
      *   "message": "Validation failed",
      *   "errors": {
-     *     "order_id": ["OrderId field should be an integer."]
+     *     "orderId": ["OrderId field should be an integer."]
      *   }
      * }
      * ```
@@ -1523,7 +1608,7 @@ export class SpotTradingClient {
      *   "code": 2,
      *   "message": "Inner validation failed",
      *   "errors": {
-     *     "order_id": ["Unexecuted order was not found."]
+     *     "orderId": ["Unexecuted order was not found."]
      *   }
      * }
      * ```
@@ -1540,7 +1625,7 @@ export class SpotTradingClient {
      *     await client.spotTrading.cancelOrder({
      *         market: "BTC_USDT",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public cancelOrder(
@@ -1558,7 +1643,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1613,7 +1701,232 @@ export class SpotTradingClient {
     }
 
     /**
-     * Cancels all orders that meet the conditions [order](/glossary#orders).
+     * The endpoint cancels up to 100 [orders](/glossary#orders) in a single request. Each item identifies a target order by `market` plus exactly one of `orderId` or `clientOrderId`. The response is an array whose items match the input order one-to-one — `response[i]` corresponds to `request.orders[i]`.
+     *
+     * <Warning>
+     * Rate limit: 10000 requests/10 sec.
+     * </Warning>
+     *
+     * <Warning>
+     * Limit: From 1 to 100 orders per request.
+     * </Warning>
+     *
+     * <Note>
+     * - Provide exactly one of `orderId` or `clientOrderId` per item. Sending both, or neither, returns a per-item validation error.
+     * - The endpoint always processes every item independently. There is no `stopOnFail`-style switch.
+     * - When the caller is not authenticated, the API returns the standard authorization error and skips per-item validation.
+     * </Note>
+     *
+     * <Accordion title="Error Codes">
+     * - `30` — validation failure (per-item)
+     * - `404` — order not found (per-item)
+     * - `500` — trade service unavailable (per-item)
+     * </Accordion>
+     *
+     * <Accordion title="Errors">
+     * **Per-item errors (returned inside the response array):**
+     *
+     * Element is not a valid object:
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 30,
+     *     "message": "Validation failed",
+     *     "errors": { "request": ["Invalid order format"] }
+     *   }
+     * }
+     * ```
+     *
+     * `market` field is missing:
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 30,
+     *     "message": "Validation failed",
+     *     "errors": { "market": ["validation.required"] }
+     *   }
+     * }
+     * ```
+     *
+     * Specified market does not exist:
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 30,
+     *     "message": "Validation failed",
+     *     "errors": { "market": ["validation.market_not_exist"] }
+     *   }
+     * }
+     * ```
+     *
+     * Neither `orderId` nor `clientOrderId` provided:
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 30,
+     *     "message": "Validation failed",
+     *     "errors": { "request": ["validation.required"] }
+     *   }
+     * }
+     * ```
+     *
+     * Both `orderId` and `clientOrderId` provided:
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 30,
+     *     "message": "Validation failed",
+     *     "errors": { "request": ["api.validation.order.chooseOneId"] }
+     *   }
+     * }
+     * ```
+     *
+     * Order not found (returned for both `orderId` and `clientOrderId` lookups):
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 404,
+     *     "message": "Order not found",
+     *     "errors": {
+     *       "orderId": ["Order does not exist or already cancelled"]
+     *     }
+     *   }
+     * }
+     * ```
+     *
+     * Trade service unavailable (returned when the trade service is unreachable or returns an unparseable response):
+     * ```json
+     * {
+     *   "result": null,
+     *   "error": {
+     *     "code": 500,
+     *     "message": "Service temporary unavailable",
+     *     "errors": { "error": ["Service temporary unavailable"] }
+     *   }
+     * }
+     * ```
+     *
+     * **Request-level errors (HTTP 422, returned as a standard error envelope, not as an array):**
+     *
+     * `orders` field is missing or is not an array:
+     * ```json
+     * {
+     *   "code": 30,
+     *   "message": "Validation failed",
+     *   "errors": { "orders": ["validation.required"] }
+     * }
+     * ```
+     *
+     * `orders` contains more than 100 elements:
+     * ```json
+     * {
+     *   "code": 30,
+     *   "message": "Validation failed",
+     *   "errors": { "orders": ["validation.between"] }
+     * }
+     * ```
+     * </Accordion>
+     *
+     * @param {WhitebitApi.CancelBulkOrdersRequest} request
+     * @param {SpotTradingClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     * @throws {@link WhitebitApi.ServiceUnavailableError}
+     *
+     * @example
+     *     await client.spotTrading.cancelBulkOrders({
+     *         orders: [{
+     *                 market: "BTC_USDT",
+     *                 orderId: 4326248250
+     *             }, {
+     *                 market: "ETH_USDT",
+     *                 clientOrderId: "my-client-id"
+     *             }],
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
+     *     })
+     */
+    public cancelBulkOrders(
+        request: WhitebitApi.CancelBulkOrdersRequest,
+        requestOptions?: SpotTradingClient.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.BulkCancelOrderResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__cancelBulkOrders(request, requestOptions));
+    }
+
+    private async __cancelBulkOrders(
+        request: WhitebitApi.CancelBulkOrdersRequest,
+        requestOptions?: SpotTradingClient.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.BulkCancelOrderResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/order/cancel/bulk",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as WhitebitApi.BulkCancelOrderResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new WhitebitApi.ServiceUnavailableError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/api/v4/order/cancel/bulk");
+    }
+
+    /**
+     * The endpoint cancels all open [orders](/glossary#orders) that match the specified filters. Use the `market` parameter to target a single trading pair, or omit the parameter to cancel across all markets. The `type` parameter filters by order type (`spot`, `margin`, `futures`). When omitted, the endpoint targets all order types.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -1687,7 +2000,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1742,14 +2058,18 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint retrieves [active orders](/glossary#active-orders) (orders not yet executed).
+     * The endpoint retrieves [active orders](/glossary#active-orders) (orders not yet executed). The response includes limit, stop-limit, and stop-market orders that remain open on the order book. Use the `market` parameter to filter by trading pair, or omit the parameter to retrieve orders across all markets. The endpoint supports pagination with `limit` and `offset` parameters.
      *
      * <Warning>
      * Rate limit: 12000 requests/10 sec.
      * </Warning>
      *
      * <Note>
-     * Search across all markets is available only if client_order_id and order_id are not provided.
+     * Search across all markets is available only if clientOrderId and orderId are not provided.
+     * </Note>
+     *
+     * <Note>
+     * This endpoint supports pagination. Use `limit` (default: 50, max: 100) and `offset` (default: 0, max: 4294967295) to page through results. The response does not include a `total` field — detect the last page when fewer than `limit` orders are returned. An empty array means you have paged past the end; receiving exactly `limit` orders does not guarantee that another page exists.
      * </Note>
      *
      * <Accordion title="Errors">
@@ -1769,7 +2089,7 @@ export class SpotTradingClient {
      *   "message": "Validation failed",
      *   "errors": {
      *     "limit": ["The limit may not be greater than 100."],
-     *     "offset": ["The offset may not be greater than 10000."]
+     *     "offset": ["The offset may not be greater than 4294967295."]
      *   }
      * }
      * ```
@@ -1800,7 +2120,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1855,14 +2178,26 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint retrieves all deals for all markets. Can be filtered by single market if needed.
+     * The endpoint retrieves executed order history for all trading types — spot, margin, and futures — across all markets. Can be filtered by a single market if needed. Results are ordered by trade time, newest first.
      *
      * <Warning>
      * Rate limit: 12000 requests/10 sec.
      * </Warning>
      *
+     * <Warning>
+     * Requests with `limit` values above 100 return large payloads. Use high limits only when necessary and ensure the client application can handle large response sizes.
+     * </Warning>
+     *
      * <Note>
-     * The endpoint can retrieve data not older than 6 months from current month. For older data, use the Report on the History page.
+     * The endpoint can retrieve data not older than 6 months from the current month. For older data, use the Report on the History page.
+     * </Note>
+     *
+     * <Note>
+     * This endpoint supports pagination. Use `limit` (default: 50, max: 500) and `offset` (default: 0) to page through results. The response does not include a `total` field — detect the last page when fewer than `limit` records are returned (sum the records across all markets when no `market` filter is set). An empty response means you have paged past the end; receiving exactly `limit` records does not guarantee that another page exists.
+     * </Note>
+     *
+     * <Note>
+     * For B2B accounts, canceled orders are not recorded in the history. To obtain canceled-order data, contact support or the assigned account manager.
      * </Note>
      *
      * <Accordion title="Errors">
@@ -1886,6 +2221,17 @@ export class SpotTradingClient {
      *   }
      * }
      * ```
+     *
+     * ```json
+     * {
+     *   "code": 30,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "orderHistory": ["OrderHistory was not found."]
+     *   }
+     * }
+     * ```
+     * Returned when `clientOrderId` is supplied but no order matches it on the calling account.
      * </Accordion>
      *
      * @param {WhitebitApi.GetExecutedOrderHistoryRequest} request
@@ -1901,19 +2247,22 @@ export class SpotTradingClient {
     public getExecutedOrderHistory(
         request: WhitebitApi.GetExecutedOrderHistoryRequest = {},
         requestOptions?: SpotTradingClient.RequestOptions,
-    ): core.HttpResponsePromise<WhitebitApi.GetExecutedOrderHistoryResponseItem[]> {
+    ): core.HttpResponsePromise<WhitebitApi.GetExecutedOrderHistoryResponse> {
         return core.HttpResponsePromise.fromPromise(this.__getExecutedOrderHistory(request, requestOptions));
     }
 
     private async __getExecutedOrderHistory(
         request: WhitebitApi.GetExecutedOrderHistoryRequest = {},
         requestOptions?: SpotTradingClient.RequestOptions,
-    ): Promise<core.WithRawResponse<WhitebitApi.GetExecutedOrderHistoryResponseItem[]>> {
+    ): Promise<core.WithRawResponse<WhitebitApi.GetExecutedOrderHistoryResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -1939,7 +2288,7 @@ export class SpotTradingClient {
         });
         if (_response.ok) {
             return {
-                data: _response.body as WhitebitApi.GetExecutedOrderHistoryResponseItem[],
+                data: _response.body as WhitebitApi.GetExecutedOrderHistoryResponse,
                 rawResponse: _response.rawResponse,
             };
         }
@@ -1976,11 +2325,27 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint retrieves deals for a specific order.
+     * The endpoint retrieves individual trade fills (deals) for a specific order. Each deal represents a partial or full execution of the order against a counterparty. The response includes pagination and returns deal details such as price, amount, fee, and execution role (maker or taker).
      *
      * <Warning>
      * Rate limit: 12000 requests/10 sec.
      * </Warning>
+     *
+     * <Note>
+     * This endpoint supports pagination. Use `limit` (default: 50) and `offset` (default: 0) to page through results. The response does not include a `total` field — detect the last page when `records.length < limit`. An empty `records` array means you have paged past the end; receiving exactly `limit` records does not guarantee that another page exists.
+     * </Note>
+     *
+     * <Note>
+     * An unknown or not-owned `orderId` is **not** an error. The endpoint always returns HTTP 200 with the paged-list envelope; a non-matching `orderId` simply filters down to an empty `records` array.
+     * </Note>
+     *
+     * <Note>
+     * The endpoint can retrieve data not older than 6 months from the current month. For older data, use the Report on the History page. An order older than this window returns an empty `records` array even when the order was filled.
+     * </Note>
+     *
+     * <Accordion title="Error Codes">
+     *   - `30` - default validation error code (for example, a missing or malformed `orderId`, or invalid pagination)
+     * </Accordion>
      *
      * @param {WhitebitApi.GetOrderDealsRequest} request
      * @param {SpotTradingClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -1991,9 +2356,9 @@ export class SpotTradingClient {
      *
      * @example
      *     await client.spotTrading.getOrderDeals({
-     *         order_id: 3134995325,
+     *         orderId: 3134995325,
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public getOrderDeals(
@@ -2011,7 +2376,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -2066,11 +2434,40 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint retrieves order history.
+     * The endpoint retrieves the history of executed and cancelled orders. The response groups orders by market name. Use the `market` parameter to filter by a single trading pair, or omit the parameter to retrieve orders across all markets. The endpoint supports pagination with `limit` (default 50, max 500) and `offset` parameters. Results are ordered by time, newest first.
      *
      * <Warning>
      * Rate limit: 12000 requests/10 sec.
      * </Warning>
+     *
+     * <Warning>
+     * Requests with `limit` values above 100 return large payloads. Use high limits only when necessary and ensure the client application can handle large response sizes.
+     * </Warning>
+     *
+     * <Note>
+     * This endpoint supports pagination. Use `limit` (default: 50, max: 500) and `offset` (default: 0) to page through results. The response does not include a `total` field — detect the last page when fewer than `limit` records are returned (sum the records across all markets when no `market` filter is set). An empty response means you have paged past the end; receiving exactly `limit` records does not guarantee that another page exists.
+     * </Note>
+     *
+     * <Note>
+     * **Date filter window:** the maximum span between `startDate` and `endDate` is **31 days**, and the earliest reachable date is **6 months ago (00:00 UTC)**. Requests that exceed the 31-day window or fall below the 6-month floor are rejected with a validation error. `endDate` values greater than the current time are silently clamped to `now`.
+     * </Note>
+     *
+     * <Note>
+     * For B2B accounts, canceled orders are not recorded in the history. To obtain canceled-order data, contact support or the assigned account manager.
+     * </Note>
+     *
+     * <Accordion title="Errors">
+     * ```json
+     * {
+     *   "code": 30,
+     *   "message": "Validation failed",
+     *   "errors": {
+     *     "orderHistory": ["OrderHistory was not found."]
+     *   }
+     * }
+     * ```
+     * Returned when `clientOrderId` is supplied but no order matches it on the calling account.
+     * </Accordion>
      *
      * @param {WhitebitApi.GetOrderHistoryRequest} request
      * @param {SpotTradingClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -2097,7 +2494,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -2160,6 +2560,113 @@ export class SpotTradingClient {
     }
 
     /**
+     * The endpoint returns the authenticated account's delisting-related order history from the order-history index. The response combines two categories of orders, each identified by the `delistingKind` field: reverse close orders that the platform generates when a market is delisted (`delistingKind` = `reverse`, `clientOrderId` prefixed with `delisting-`), and active orders canceled at the moment of delisting (`delistingKind` = `canceled`). The endpoint returns a flat array sorted by `finishAt` descending, then `id` descending.
+     *
+     * Set the `status` parameter to narrow the response: `filled` returns only reverse close orders that reached the `filled` outcome, and `delisting` returns only orders canceled during delisting. Omit `status` to return both categories merged in a single array.
+     *
+     * <Note>
+     * The endpoint supports pagination via `limit` (default: 500, max: 500) and `offset` (default: 0); the sum of `offset` and `limit` must not exceed 10000. A response that returns fewer than `limit` records indicates the last page.
+     * </Note>
+     *
+     * <Note>
+     * **Date filter window:** the date range filters orders by the `finishAt` timestamp. The maximum span between `startDate` and `endDate` is **31 days**. `endDate` values greater than the current time are clamped to `now`.
+     * </Note>
+     *
+     * <Warning>
+     * Rate limit: 10000 requests/10 sec.
+     * </Warning>
+     *
+     * @param {WhitebitApi.GetDelistingOrderHistoryRequest} request
+     * @param {SpotTradingClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     * @throws {@link WhitebitApi.ServiceUnavailableError}
+     *
+     * @example
+     *     await client.spotTrading.getDelistingOrderHistory()
+     */
+    public getDelistingOrderHistory(
+        request: WhitebitApi.GetDelistingOrderHistoryRequest = {},
+        requestOptions?: SpotTradingClient.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.GetDelistingOrderHistoryResponseItem[]> {
+        return core.HttpResponsePromise.fromPromise(this.__getDelistingOrderHistory(request, requestOptions));
+    }
+
+    private async __getDelistingOrderHistory(
+        request: WhitebitApi.GetDelistingOrderHistoryRequest = {},
+        requestOptions?: SpotTradingClient.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.GetDelistingOrderHistoryResponseItem[]>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/trade-account/order/history/query",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as WhitebitApi.GetDelistingOrderHistoryResponseItem[],
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new WhitebitApi.ServiceUnavailableError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/api/v4/trade-account/order/history/query",
+        );
+    }
+
+    /**
      * The endpoint modifies existing [order](/glossary#orders).
      *
      * Supported order types: limit, stop limit, stop market.
@@ -2172,9 +2679,20 @@ export class SpotTradingClient {
      *
      * <Note>
      * - Use total parameter instead of amount for modify buy stop market order.
-     * - Modification by client_order_id takes priority.
-     * - The request supports working only with order_id or only with client_order_id.
+     * - Modification by clientOrderId takes priority.
+     * - The request supports working only with orderId or only with clientOrderId.
      * - Do not pass both values at the same time.
+     * </Note>
+     *
+     * <Note>
+     * **WebSocket impact:** Each call to the endpoint cancels the original order and
+     * creates a replacement with a **new `orderId`**. Clients subscribed to the
+     * `ordersPending_update` WebSocket channel will receive:
+     * - `event_id=3` (cancel) for the old order
+     * - `event_id=1` (new) for the replacement
+     *
+     * Update any `orderId` references after a successful modify response.
+     * Use `clientOrderId` for stable order tracking across modifications.
      * </Note>
      *
      * <Accordion title="Error Codes">
@@ -2199,7 +2717,7 @@ export class SpotTradingClient {
      *   "code": 2,
      *   "message": "Inner validation failed",
      *   "errors": {
-     *     "order_id": ["Unexecuted order was not found."]
+     *     "orderId": ["Unexecuted order was not found."]
      *   }
      * }
      * ```
@@ -2226,7 +2744,7 @@ export class SpotTradingClient {
      *     await client.spotTrading.modifyOrder({
      *         market: "BTC_USDT",
      *         request: "{{request}}",
-     *         nonce: "{{nonce}}"
+     *         nonce: 1594297865000
      *     })
      */
     public modifyOrder(
@@ -2244,7 +2762,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -2299,7 +2820,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint creates, updates, deletes [kill-switch timer](/glossary#kill-switch-timer).
+     * The endpoint creates, updates, or deletes a [kill-switch timer](/glossary#kill-switch-timer). The kill-switch acts as a safety mechanism for automated trading systems — the timer automatically cancels all open orders for the specified market if the client fails to reset the timer before expiration. Set `timeout` to a value between `5` and `600` (seconds) to create or update a timer. Set `timeout` to `null` to delete an existing timer.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -2375,7 +2896,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -2425,7 +2949,7 @@ export class SpotTradingClient {
     }
 
     /**
-     * The endpoint retrieves the status of [kill-switch timer](/glossary#kill-switch-timer).
+     * The endpoint retrieves the status of active [kill-switch timers](/glossary#kill-switch-timer). The response returns an array of timer objects for the specified market, or for all markets if the `market` parameter is omitted. Each timer object includes the start time, scheduled cancellation time, and targeted order types.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
@@ -2472,7 +2996,10 @@ export class SpotTradingClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ "X-TXC-APIKEY": requestOptions?.txcApikey ?? this._options?.txcApikey }),
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({

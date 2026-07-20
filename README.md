@@ -105,11 +105,8 @@ await client.withdraw.createWithdraw({ ticker: "USDT", amount: "500", address: "
 | `transfer` | Transfer between main and trade accounts |
 | `withdraw` | Withdrawal requests |
 | `codes` | WhiteBit codes — create, apply, history |
-| `cryptoLendingFixed` | Fixed lending plans |
-| `cryptoLendingFlex` | Flex lending plans |
 | `fees` | Trading fees |
 | `subAccount` | Sub-account management |
-| `miningPool` | Hashrate and rewards |
 
 ---
 

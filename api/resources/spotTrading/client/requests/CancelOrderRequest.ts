@@ -5,16 +5,16 @@
  *     {
  *         market: "BTC_USDT",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CancelOrderRequest {
     /** Available [market](/glossary#market). Example: BTC_USDT */
     market: string;
-    /** Order Id. Example: 4180284841. Required if client_order_id is not set. */
-    order_id?: number;
-    /** Custom client order id. Example: 'customId11'. Required if order_id is not set. */
-    client_order_id?: string;
+    /** Order Id. Example: 4180284841. Required if clientOrderId is not set. */
+    orderId?: number;
+    /** Custom client order id. Example: 'customId11'. Required if orderId is not set. */
+    clientOrderId?: string;
     request: string;
-    nonce: string;
+    nonce: number;
 }

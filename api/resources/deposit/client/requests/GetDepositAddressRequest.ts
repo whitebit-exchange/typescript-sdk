@@ -5,7 +5,7 @@
  *     {
  *         ticker: "BTC",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface GetDepositAddressRequest {
@@ -16,5 +16,5 @@ export interface GetDepositAddressRequest {
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

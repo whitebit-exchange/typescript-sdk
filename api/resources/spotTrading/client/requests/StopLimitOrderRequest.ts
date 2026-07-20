@@ -9,43 +9,55 @@
  *         price: "9800",
  *         activation_price: "10000",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface StopLimitOrderRequest {
-    /** Available [market](/glossary#market). Example: BTC_USDT */
+    /** Trading pair. Format: `BASE_QUOTE` (e.g., `BTC_USDT`). Query `GET /api/v4/public/markets` for available markets. */
     market: string;
-    /** Order type. Variables: 'buy' / 'sell' Example: 'buy' */
+    /** Order side. Allowed values: `buy`, `sell`. */
     side: StopLimitOrderRequest.Side;
-    /** Amount of [stock](/glossary#stock) currency to buy or sell. Example: '0.001' or 0.001 */
+    /** Order quantity in base (stock) currency. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, `maxTotal`. Precision: `stockPrec`. */
     amount: string;
-    /** Price in [money](/glossary#money) currency. Example: '9800' or 9800 */
+    /** Limit price per unit in quote (money) currency applied after the stop triggers. Minimum and maximum values are market-dependent. Precision: `moneyPrec`. */
     price: string;
-    /** Activation price in [money](/glossary#money) currency. Example: '10000' or 10000 */
+    /** Trigger price in quote (money) currency. For buy orders, the stop triggers when the market price rises to or above the specified price. For sell orders, the stop triggers when the market price falls to or below the specified price. Precision: `moneyPrec`. */
     activation_price: string;
-    /** Identifier should be unique and contain letters, dashes, numbers, dots or underscores. The identifier must be unique. */
-    client_order_id?: string;
-    /** When the [BBO](/glossary#bbo) option is activated for Limit orders, the system selects the best market prices for execution. Variables: 1 - Queue Method / 2 - Counterparty Method. */
+    /** Custom client order identifier. Uniqueness is enforced only among the account's open (pending) orders on the same market — once a previous order is filled or canceled, the same identifier can be reused, including on the same market. Contains only letters, numbers, dashes, dots, or underscores. */
+    clientOrderId?: string;
+    /** Best Bid/Offer ([BBO](/glossary#bbo)) execution method. The system selects the best market price for execution after the stop triggers. `1` = Queue method, `2` = Counterparty method. */
     bboRole?: number;
-    /** Self trade prevention mode. Variables: 'no' / 'cancel_both' / 'cancel_new' / 'cancel_old'. Example: 'no'. */
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
     stp?: StopLimitOrderRequest.Stp;
     request: string;
-    nonce: string;
+    nonce: number;
 }
 
 export namespace StopLimitOrderRequest {
-    /** Order type. Variables: 'buy' / 'sell' Example: 'buy' */
+    /** Order side. Allowed values: `buy`, `sell`. */
     export const Side = {
         Buy: "buy",
         Sell: "sell",
     } as const;
     export type Side = (typeof Side)[keyof typeof Side];
-    /** Self trade prevention mode. Variables: 'no' / 'cancel_both' / 'cancel_new' / 'cancel_old'. Example: 'no'. */
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
     export const Stp = {
         No: "no",
-        CancelBoth: "cancel_both",
-        CancelNew: "cancel_new",
-        CancelOld: "cancel_old",
+        Cb: "cb",
+        Cn: "cn",
+        Co: "co",
     } as const;
     export type Stp = (typeof Stp)[keyof typeof Stp];
 }

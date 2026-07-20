@@ -3,11 +3,19 @@
 export interface LastpriceUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `lastprice_update`. */
-    method: "lastprice_update";
+    method: LastpriceUpdate.Method;
     /**
      * Update event parameters:
      * - [0] Market name
      * - [1] Last price
      */
     params: unknown[];
+}
+
+export namespace LastpriceUpdate {
+    /** Method name. Fixed value: `lastprice_update`. */
+    export const Method = {
+        LastpriceUpdate: "lastprice_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

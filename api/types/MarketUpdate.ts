@@ -3,11 +3,19 @@
 export interface MarketUpdate {
     id: unknown | null;
     /** Method name. Fixed value: `market_update`. */
-    method: "market_update";
+    method: MarketUpdate.Method;
     /**
      * Update event parameters:
      * - [0] Market name
      * - [1] MarketStatistics object
      */
     params: unknown[];
+}
+
+export namespace MarketUpdate {
+    /** Method name. Fixed value: `market_update`. */
+    export const Method = {
+        MarketUpdate: "market_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

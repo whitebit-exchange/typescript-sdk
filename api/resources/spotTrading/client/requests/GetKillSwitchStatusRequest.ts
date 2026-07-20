@@ -8,5 +8,5 @@ export interface GetKillSwitchStatusRequest {
     /** Available [market](/glossary#market). Example: BTC_USDT */
     market?: string;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

@@ -4,11 +4,19 @@ export interface BorrowsEventsUpdate {
     /** Update events have null id */
     id: unknown | null;
     /** Method name. Fixed value: `borrowsAccountMargin_update`. */
-    method: "borrowsAccountMargin_update";
+    method: BorrowsEventsUpdate.Method;
     /**
      * Event tuple:
      * - [0] Event type (1=Margin call, 2=Liquidation)
      * - [1] Borrow object with all borrow details
      */
     params: unknown[];
+}
+
+export namespace BorrowsEventsUpdate {
+    /** Method name. Fixed value: `borrowsAccountMargin_update`. */
+    export const Method = {
+        BorrowsAccountMarginUpdate: "borrowsAccountMargin_update",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

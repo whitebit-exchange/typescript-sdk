@@ -9,27 +9,80 @@
  *         price: "40000",
  *         activation_price: "41000",
  *         stop_limit_price: "42000",
- *         client_order_id: "order1987111",
+ *         clientOrderId: "order1987111",
+ *         reduceOnly: false,
+ *         positionSide: "LONG",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CreateCollateralOcoOrderRequest {
+    /** Available margin [market](/glossary#market). Example: BTC_USDT */
     market: string;
+    /** Order direction. Use `buy` to open or increase a long position and `sell` to open or increase a short position. */
     side: CreateCollateralOcoOrderRequest.Side;
+    /** Amount of [stock](/glossary#stock) currency for both legs of the OCO order. Minimum and step values are market-dependent — query the [market info](/api-reference/market-data/market-info) endpoint for constraints. */
     amount: string;
+    /** Limit order price in [money](/glossary#money) currency for the take-profit leg. */
     price: string;
+    /** Trigger price in [money](/glossary#money) currency for the stop-loss leg. The stop-limit order activates when the market price reaches the specified value. */
     activation_price: string;
+    /** Execution price in [money](/glossary#money) currency for the stop-loss leg. After activation, the stop-loss leg places a limit order at the specified price. */
     stop_limit_price: string;
-    client_order_id?: string;
+    /** Custom client order identifier. Uniqueness is enforced only among the account's open (pending) orders on the same market — once a previous order is filled or canceled, the same identifier can be reused, including on the same market. Contains only letters, numbers, dashes, dots, or underscores. */
+    clientOrderId?: string;
+    /** When `true`, both legs of the OCO order can only reduce or close an existing position — neither leg can increase the position or open a new one. If the order amount exceeds the current position size, the system reduces the order to match — the response returns the adjusted amount. The API returns error code `116` if no open position exists or the order side matches the position direction. See [reduce-only](/glossary#reduce-only). */
+    reduceOnly?: boolean;
+    /**
+     * Position direction. Optional at the request layer but functionally required when hedge mode is enabled. See [positionSide](/glossary#position-side). Both legs of the OCO inherit the value.
+     *
+     * - **One-way mode** (default account mode): the field is ignored. Orders always use `BOTH`, and the response returns `positionSide: "BOTH"` on each leg whether the field is sent or omitted.
+     * - **Hedge mode**: the field MUST be `LONG` or `SHORT`. Sending `BOTH`, omitting the field, or sending a value that does not match the account's mode causes the trade service to reject the order with error code `114` (`Hedge mode position side does not match`).
+     */
+    positionSide?: CreateCollateralOcoOrderRequest.PositionSide;
+    /**
+     * Self-trade prevention mode. The value applies to both legs of the OCO order. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
+    stp?: CreateCollateralOcoOrderRequest.Stp;
     request: string;
-    nonce: string;
+    nonce: number;
 }
 
 export namespace CreateCollateralOcoOrderRequest {
+    /** Order direction. Use `buy` to open or increase a long position and `sell` to open or increase a short position. */
     export const Side = {
         Buy: "buy",
         Sell: "sell",
     } as const;
     export type Side = (typeof Side)[keyof typeof Side];
+    /**
+     * Position direction. Optional at the request layer but functionally required when hedge mode is enabled. See [positionSide](/glossary#position-side). Both legs of the OCO inherit the value.
+     *
+     * - **One-way mode** (default account mode): the field is ignored. Orders always use `BOTH`, and the response returns `positionSide: "BOTH"` on each leg whether the field is sent or omitted.
+     * - **Hedge mode**: the field MUST be `LONG` or `SHORT`. Sending `BOTH`, omitting the field, or sending a value that does not match the account's mode causes the trade service to reject the order with error code `114` (`Hedge mode position side does not match`).
+     */
+    export const PositionSide = {
+        Long: "LONG",
+        Short: "SHORT",
+        Both: "BOTH",
+    } as const;
+    export type PositionSide = (typeof PositionSide)[keyof typeof PositionSide];
+    /**
+     * Self-trade prevention mode. The value applies to both legs of the OCO order. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
+    export const Stp = {
+        No: "no",
+        Cb: "cb",
+        Cn: "cn",
+        Co: "co",
+    } as const;
+    export type Stp = (typeof Stp)[keyof typeof Stp];
 }

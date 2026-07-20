@@ -6,8 +6,21 @@ export interface GetMarketFeeResponse {
     taker?: string | undefined;
     /** Maker fee percentage */
     maker?: string | undefined;
-    /** Effective futures taker fee rate for the specified market. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
+    /** Default effective futures taker fee rate. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
     futures_taker?: string | undefined;
-    /** Effective futures maker fee rate for the specified market. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
+    /** Default effective futures maker fee rate. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
     futures_maker?: string | undefined;
+    /** Per-market fee overrides, keyed by market name. Each value contains the market's custom `taker` and `maker` rates. */
+    custom_fee?: Record<string, GetMarketFeeResponse.CustomFee.Value> | undefined;
+}
+
+export namespace GetMarketFeeResponse {
+    export namespace CustomFee {
+        export interface Value {
+            /** Custom taker fee percentage for the market */
+            taker?: string | undefined;
+            /** Custom maker fee percentage for the market */
+            maker?: string | undefined;
+        }
+    }
 }

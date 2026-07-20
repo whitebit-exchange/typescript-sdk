@@ -7,18 +7,22 @@
  *         positionSide: "LONG",
  *         market: "BTC_USDT",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface ClosePositionRequest {
+    /** Unique identifier of the position to close. Obtain from the [open positions](/api-reference/collateral-trading/open-positions) endpoint. */
     positionId: number;
+    /** Defines the position direction when hedge mode is enabled. See [positionSide](/glossary#position-side) */
     positionSide?: ClosePositionRequest.PositionSide;
+    /** Market of the position to close. Example: BTC_USDT */
     market: string;
     request: string;
-    nonce: string;
+    nonce: number;
 }
 
 export namespace ClosePositionRequest {
+    /** Defines the position direction when hedge mode is enabled. See [positionSide](/glossary#position-side) */
     export const PositionSide = {
         Long: "LONG",
         Short: "SHORT",

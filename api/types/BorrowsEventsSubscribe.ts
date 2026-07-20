@@ -4,7 +4,15 @@ export interface BorrowsEventsSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `borrowsAccountMargin_subscribe`. */
-    method: "borrowsAccountMargin_subscribe";
+    method: BorrowsEventsSubscribe.Method;
     /** Empty array */
     params: unknown[];
+}
+
+export namespace BorrowsEventsSubscribe {
+    /** Method name. Fixed value: `borrowsAccountMargin_subscribe`. */
+    export const Method = {
+        BorrowsAccountMarginSubscribe: "borrowsAccountMargin_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

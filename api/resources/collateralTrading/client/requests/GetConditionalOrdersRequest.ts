@@ -9,9 +9,16 @@
  *     }
  */
 export interface GetConditionalOrdersRequest {
+    /**
+     * Filter by specific market. Example: BTC_USDT
+     *
+     * If not specified, returns conditional orders for all markets.
+     */
     market?: string;
+    /** Number of records to skip for pagination. */
     offset?: number;
+    /** Maximum number of records to return per page. */
     limit?: number;
     request?: string;
-    nonce?: string;
+    nonce?: number;
 }

@@ -4,7 +4,7 @@ export interface DealsRequest {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `deals_request`. */
-    method: "deals_request";
+    method: DealsRequest.Method;
     /**
      * Query parameters tuple:
      * - [0] Market name
@@ -12,4 +12,12 @@ export interface DealsRequest {
      * - [2] Limit (max 100)
      */
     params: unknown[];
+}
+
+export namespace DealsRequest {
+    /** Method name. Fixed value: `deals_request`. */
+    export const Method = {
+        DealsRequest: "deals_request",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

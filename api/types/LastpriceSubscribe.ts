@@ -4,6 +4,14 @@ export interface LastpriceSubscribe {
     /** Unique request identifier */
     id: number;
     /** Method name. Fixed value: `lastprice_subscribe`. */
-    method: "lastprice_subscribe";
+    method: LastpriceSubscribe.Method;
     params: string[];
+}
+
+export namespace LastpriceSubscribe {
+    /** Method name. Fixed value: `lastprice_subscribe`. */
+    export const Method = {
+        LastpriceSubscribe: "lastprice_subscribe",
+    } as const;
+    export type Method = (typeof Method)[keyof typeof Method];
 }

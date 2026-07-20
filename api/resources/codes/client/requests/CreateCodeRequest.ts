@@ -8,20 +8,20 @@
  *         passphrase: "some passphrase",
  *         description: "some description",
  *         request: "{{request}}",
- *         nonce: "{{nonce}}"
+ *         nonce: 1594297865000
  *     }
  */
 export interface CreateCodeRequest {
     /** Currency's [ticker](/glossary#ticker). Example: BTC */
     ticker: string;
-    /** Amount to transfer. Max [precision](/glossary#precision) = 8, value must be greater than zero and less than or equal to the [main balance](/glossary#balance-main). */
+    /** Amount to transfer. Up to 18 decimal places, value greater than zero and capped at 1e17 (10^17), and not exceeding the [main balance](/glossary#balance-main). */
     amount: string;
     /** Passphrase for applying [WhiteBIT codes](/glossary#whitebit-codes). Passphrase must contain only latin letters, numbers and symbols (like !@#$%^, no whitespaces). Max: 25 symbols. */
     passphrase?: string;
-    /** Additional text description for [code](/glossary#whitebit-codes). Visible only for creator. Max: 75 symbols. */
+    /** Additional text description for [code](/glossary#whitebit-codes). Visible only for creator. Max: 280 symbols. */
     description?: string;
     /** Request signature */
     request: string;
     /** Unique request identifier */
-    nonce: string;
+    nonce: number;
 }

@@ -9,9 +9,7 @@ export interface GetOpenPositionsResponseItem {
     amount?: string | undefined;
     /** Base price of position */
     basePrice?: string | undefined;
-    /** Liquidation price according to current state of position */
-    liqPrice?: (string | null) | undefined;
-    /** Unrealized profit and loss in money */
+    /** Realized profit and loss accumulated from partial position closes, in money currency. Zero for newly opened positions that have not been partially closed. */
     pnl?: string | undefined;
     /** Unrealized profit and loss in percentage */
     pnlPercent?: string | undefined;
@@ -19,9 +17,9 @@ export interface GetOpenPositionsResponseItem {
     margin?: string | undefined;
     /** Free funds for trading */
     freeMargin?: string | undefined;
-    /** Funding that will be paid on next position stage change */
+    /** Cumulative funding fees paid over the entire lifetime of the position, in money currency. For futures markets (e.g., BTC_PERP and other _PERP pairs), the value is always "0" — futures funding is applied via periodic balance updates rather than being tracked per position. */
     funding?: string | undefined;
-    /** Unrealized profit and loss */
+    /** Floating (mark-to-market) unrealized profit and loss in money currency. Updates continuously as the market price changes. */
     unrealizedPnl?: string | undefined;
     /** Position side */
     positionSide?: GetOpenPositionsResponseItem.PositionSide | undefined;
@@ -35,7 +33,7 @@ export interface GetOpenPositionsResponseItem {
     liquidationState?: (GetOpenPositionsResponseItem.LiquidationState | null) | undefined;
     /** Take profit and stop loss configuration */
     tpsl?: (GetOpenPositionsResponseItem.Tpsl | null) | undefined;
-    /** Funding that will be paid on next position stage change */
+    /** Funding fees accrued since the last position state change and not yet realized. For margin positions, the value accumulates continuously and is settled into the funding field when the position state changes (e.g., on partial or full close). For futures markets (BTC_PERP and other _PERP pairs), always "0" — futures funding is applied via periodic balance updates, not tracked per position. */
     unrealizedFunding?: string | undefined;
 }
 

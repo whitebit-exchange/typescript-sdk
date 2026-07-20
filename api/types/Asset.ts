@@ -13,9 +13,9 @@ export interface Asset {
     min_withdraw?: string | undefined;
     /** Maximum withdrawal amount for the asset */
     max_withdraw?: string | undefined;
-    /** Maker fee in percentage */
+    /** Maker fee expressed as a direct percentage value (e.g., "0.1" means 0.1%). Note: GET /api/v4/public/markets expresses the same fee as a decimal ratio (e.g., "0.001" = 0.1%) — the formats differ between endpoints. */
     maker_fee?: string | undefined;
-    /** Taker fee in percentage */
+    /** Taker fee expressed as a direct percentage value (e.g., "0.1" means 0.1%). Note: GET /api/v4/public/markets expresses the same fee as a decimal ratio (e.g., "0.001" = 0.1%) — the formats differ between endpoints. */
     taker_fee?: string | undefined;
     /** Min deposit amount */
     min_deposit?: string | undefined;
@@ -31,9 +31,9 @@ export interface Asset {
     networks?: Asset.Networks | undefined;
     /** Currency limits by each network */
     limits?: Asset.Limits | undefined;
-    /** Deposit confirmations count mapped by network */
+    /** Required blockchain confirmations for deposits, mapped by network name (e.g., {"BTC": 2, "ERC20": 20}). Absent for fiat currencies, demo assets, and internal exchange tokens (e.g., UAH, EUR, DBTC, DUSDT). Individual network keys may also be absent if a network was historically supported but is currently disabled. */
     confirmations?: Record<string, number> | undefined;
-    /** Fiat currency providers */
+    /** Payment provider identifiers for fiat assets (e.g., VISAMASTER, ADVCASH, GEOPAY). Use these identifiers as the network parameter value when making fiat deposits or withdrawals via the API — equivalent to network codes such as ERC20 or TRC20 for crypto assets. */
     providers?: Asset.Providers | undefined;
 }
 
@@ -50,11 +50,11 @@ export namespace Asset {
      * Currency networks
      */
     export interface Networks {
-        /** Networks available for depositing */
+        /** Networks available for depositing. Absent when deposits are disabled for the asset (can_deposit: false). Examples of assets where the field may be absent: AMB, AVA, A, KZT. */
         deposits?: string[] | undefined;
-        /** Networks available for withdrawing */
+        /** Networks available for withdrawing. Absent when withdrawals are disabled for the asset (can_withdraw: false). Examples: AVA, A (Vaulta). */
         withdraws?: string[] | undefined;
-        /** Default network for depositing / withdrawing if available */
+        /** Default network used when no specific network is selected by the user. Absent when multiple networks exist but no explicit default priority has been configured (e.g., AGRS, ANKR, APE, POL). */
         default?: string | undefined;
     }
 
@@ -85,7 +85,7 @@ export namespace Asset {
     }
 
     /**
-     * Fiat currency providers
+     * Payment provider identifiers for fiat assets (e.g., VISAMASTER, ADVCASH, GEOPAY). Use these identifiers as the network parameter value when making fiat deposits or withdrawals via the API — equivalent to network codes such as ERC20 or TRC20 for crypto assets.
      */
     export interface Providers {
         deposits?: string[] | undefined;

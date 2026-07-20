@@ -14,23 +14,24 @@ export namespace GetOcoOrdersResponseItem {
      * Stop loss order details
      */
     export interface StopLoss {
-        order_id?: number | undefined;
-        client_order_id?: string | undefined;
+        orderId?: number | undefined;
+        clientOrderId?: string | undefined;
         market?: string | undefined;
         side?: StopLoss.Side | undefined;
         type?: string | undefined;
         timestamp?: number | undefined;
-        deal_money?: string | undefined;
-        deal_stock?: string | undefined;
+        dealMoney?: string | undefined;
+        dealStock?: string | undefined;
         amount?: string | undefined;
         takerFee?: string | undefined;
         makerFee?: string | undefined;
         left?: string | undefined;
-        deal_fee?: string | undefined;
+        dealFee?: string | undefined;
         post_only?: boolean | undefined;
         mtime?: number | undefined;
         price?: string | undefined;
         activation_price?: string | undefined;
+        /** Trigger condition derived from `side` (response-only, cannot be overridden): `buy` → `gte`, `sell` → `lte`. */
         activation_condition?: StopLoss.ActivationCondition | undefined;
         activated?: number | undefined;
         status?: string | undefined;
@@ -43,6 +44,7 @@ export namespace GetOcoOrdersResponseItem {
             Sell: "sell",
         } as const;
         export type Side = (typeof Side)[keyof typeof Side];
+        /** Trigger condition derived from `side` (response-only, cannot be overridden): `buy` → `gte`, `sell` → `lte`. */
         export const ActivationCondition = {
             Gte: "gte",
             Lte: "lte",
@@ -54,19 +56,19 @@ export namespace GetOcoOrdersResponseItem {
      * Take profit order details
      */
     export interface TakeProfit {
-        order_id?: number | undefined;
-        client_order_id?: string | undefined;
+        orderId?: number | undefined;
+        clientOrderId?: string | undefined;
         market?: string | undefined;
         side?: TakeProfit.Side | undefined;
         type?: string | undefined;
         timestamp?: number | undefined;
-        deal_money?: string | undefined;
-        deal_stock?: string | undefined;
+        dealMoney?: string | undefined;
+        dealStock?: string | undefined;
         amount?: string | undefined;
         takerFee?: string | undefined;
         makerFee?: string | undefined;
         left?: string | undefined;
-        deal_fee?: string | undefined;
+        dealFee?: string | undefined;
         post_only?: boolean | undefined;
         mtime?: number | undefined;
         price?: string | undefined;
