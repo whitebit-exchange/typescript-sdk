@@ -1,6 +1,6 @@
 {
   "name": "whitebit-typescript-sdk",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "A TypeScript SDK for WhiteBit cryptocurrency exchange API",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

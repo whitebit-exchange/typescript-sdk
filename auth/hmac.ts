@@ -47,14 +47,14 @@ export function createHmacFetch(apiSecret: string): typeof fetch {
         const payload    = encodeBase64(serialized);
         const signature  = await hmacSha512Hex(apiSecret, payload);
 
+        const headers = new Headers(init.headers);
+        headers.set("X-TXC-PAYLOAD", payload);
+        headers.set("X-TXC-SIGNATURE", signature);
+
         return fetch(input, {
             ...init,
             body: serialized,
-            headers: {
-                ...(init.headers as Record<string, string> | undefined),
-                "X-TXC-PAYLOAD":   payload,
-                "X-TXC-SIGNATURE": signature,
-            },
+            headers,
         });
     };
 }
