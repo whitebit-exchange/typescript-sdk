@@ -10,7 +10,7 @@ export type { GetOrderDealsRequest } from "./GetOrderDealsRequest.js";
 export { GetOrderHistoryRequest } from "./GetOrderHistoryRequest.js";
 export { LimitOrderRequest } from "./LimitOrderRequest.js";
 export { MarketOrderRequest } from "./MarketOrderRequest.js";
-export type { ModifyOrderRequest } from "./ModifyOrderRequest.js";
+export { ModifyOrderRequest } from "./ModifyOrderRequest.js";
 export { SetKillSwitchRequest } from "./SetKillSwitchRequest.js";
 export { StockMarketOrderRequest } from "./StockMarketOrderRequest.js";
 export { StopLimitOrderRequest } from "./StopLimitOrderRequest.js";

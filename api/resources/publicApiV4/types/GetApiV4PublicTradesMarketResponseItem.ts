@@ -14,7 +14,7 @@ export interface GetApiV4PublicTradesMarketResponseItem {
     /** Used to determine whether or not the transaction originated as a buy or sell. Buy – Identifies an ask that was removed from the order book. Sell – Identifies a bid that was removed from the order book. */
     type: GetApiV4PublicTradesMarketResponseItem.Type;
     /** Indicates that the trade originates from a Retail Price Improvement (RPI) order. */
-    rpi?: boolean | undefined;
+    rpi: boolean;
 }
 
 export namespace GetApiV4PublicTradesMarketResponseItem {

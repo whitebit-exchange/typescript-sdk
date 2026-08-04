@@ -8,6 +8,7 @@ export * from "./CreateCollateralMarketOrderResponse.js";
 export * from "./CreateCollateralOcoOrderResponse.js";
 export * from "./CreateCollateralStopLimitOrderResponse.js";
 export * from "./CreateCollateralTriggerMarketOrderResponse.js";
+export * from "./GetClosedPositionsPnlResponseItem.js";
 export * from "./GetCollateralAccountAdlQuantileResponseItem.js";
 export * from "./GetCollateralHedgeModeResponse.js";
 export * from "./GetConditionalOrdersResponse.js";

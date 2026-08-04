@@ -91,14 +91,18 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves configuration and trading rules for all available spot, futures, and TradFi futures markets. Use the response to discover tradeable pairs, check minimum order sizes, and read fee schedules. Each entry includes precision settings, fee ratios, and order-size constraints for the market.
+     * The endpoint retrieves configuration and trading rules for all available spot and futures markets (TradFi futures markets are coming soon and are not yet returned). Use the response to discover tradeable pairs, check minimum order sizes, and read fee schedules. Each entry includes precision settings, fee ratios, and order-size constraints for the market.
      *
      * <Note>
      * Market configuration is reference data, re-synced from the database approximately every 10 seconds. Polling more frequently returns identical data. The cache is shared across all callers.
      * </Note>
      *
      * <Note>
-     * TradFi futures markets are region-gated. Markets not available in a given region are omitted from the response entirely and do not appear under any other market type.
+     * TradFi futures markets are coming soon and are not yet returned by this endpoint. Once available, they will be region-gated: markets not available in a given region are omitted from the response entirely and do not appear under any other market type.
+     * </Note>
+     *
+     * <Note>
+     * A market with an announced delisting carries the announced date in `delistedAt` and stays tradeable until the delisting runs. Once the delisting runs, the platform cancels the active orders on the market and drops the market from this response — [Query delisting orders](/api-reference/spot-trading/query-delisting-orders) is a signed request that returns the authenticated account's resulting spot order records. An announcement can be rescheduled or canceled, so treat `delistedAt` as the current plan rather than a settled fact and re-read the value on the next poll.
      * </Note>
      *
      * <Warning>
@@ -489,7 +493,7 @@ export class PublicApiV4Client {
     }
 
     /**
-     * The endpoint retrieves the [trades](/glossary#deal-trade) that have been executed recently on the requested [market](/glossary#market).
+     * The endpoint retrieves the [trades](/glossary#deal-trade) that have been executed recently on the requested [market](/glossary#market). It returns up to the 100 most recent trades; the response size is fixed and there is no `limit` parameter.
      *
      * <Note>
      * The API caches the response for 1 second
@@ -806,6 +810,8 @@ export class PublicApiV4Client {
      *
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link WhitebitApi.UnavailableForLegalReasonsError}
+     *
      * @example
      *     await client.publicApiV4.collateralMarketsList()
      */
@@ -854,11 +860,19 @@ export class PublicApiV4Client {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 451:
+                    throw new WhitebitApi.UnavailableForLegalReasonsError(
+                        _response.error.body as WhitebitApi.ErrorV4,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         return handleNonStatusCodeError(
@@ -881,6 +895,8 @@ export class PublicApiV4Client {
      * </Warning>
      *
      * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.UnavailableForLegalReasonsError}
      *
      * @example
      *     await client.publicApiV4.availableFuturesMarketsList()
@@ -930,11 +946,19 @@ export class PublicApiV4Client {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.WhitebitApiError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 451:
+                    throw new WhitebitApi.UnavailableForLegalReasonsError(
+                        _response.error.body as WhitebitApi.ErrorV4,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/api/v4/public/futures");
@@ -1048,5 +1072,74 @@ export class PublicApiV4Client {
             "GET",
             "/api/v4/public/funding-history/{market}",
         );
+    }
+
+    /**
+     * The endpoint returns overall information about the current mining pool state.
+     *
+     * Hash rate is expressed in H units.
+     *
+     * <Warning>
+     * Rate limit 1000 requests/10 sec.
+     * </Warning>
+     *
+     * @param {PublicApiV4Client.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @example
+     *     await client.publicApiV4.miningPoolOverview()
+     */
+    public miningPoolOverview(
+        requestOptions?: PublicApiV4Client.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.GetApiV4PublicMiningPoolResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__miningPoolOverview(requestOptions));
+    }
+
+    private async __miningPoolOverview(
+        requestOptions?: PublicApiV4Client.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.GetApiV4PublicMiningPoolResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/public/mining-pool",
+            ),
+            method: "GET",
+            headers: _headers,
+            queryParameters: requestOptions?.queryParams,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as WhitebitApi.GetApiV4PublicMiningPoolResponse,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            throw new errors.WhitebitApiError({
+                statusCode: _response.error.statusCode,
+                body: _response.error.body,
+                rawResponse: _response.rawResponse,
+            });
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/api/v4/public/mining-pool");
     }
 }

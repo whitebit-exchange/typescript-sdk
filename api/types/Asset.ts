@@ -13,13 +13,13 @@ export interface Asset {
     min_withdraw?: string | undefined;
     /** Maximum withdrawal amount for the asset */
     max_withdraw?: string | undefined;
-    /** Maker fee expressed as a direct percentage value (e.g., "0.1" means 0.1%). Note: GET /api/v4/public/markets expresses the same fee as a decimal ratio (e.g., "0.001" = 0.1%) — the formats differ between endpoints. */
+    /** Maker fee expressed as a direct percentage value (e.g., "0.1" means 0.1%). GET /api/v4/public/markets reports the per-market `makerFee` in the same format. */
     maker_fee?: string | undefined;
-    /** Taker fee expressed as a direct percentage value (e.g., "0.1" means 0.1%). Note: GET /api/v4/public/markets expresses the same fee as a decimal ratio (e.g., "0.001" = 0.1%) — the formats differ between endpoints. */
+    /** Taker fee expressed as a direct percentage value (e.g., "0.1" means 0.1%). GET /api/v4/public/markets reports the per-market `takerFee` in the same format. */
     taker_fee?: string | undefined;
     /** Min deposit amount */
     min_deposit?: string | undefined;
-    /** Max deposit amount; omitted if no limit, 0 if unlimited */
+    /** Max deposit amount; 0 if unlimited */
     max_deposit?: string | undefined;
     /** Max number of digits to the right of the decimal point */
     currency_precision?: number | undefined;
@@ -29,7 +29,7 @@ export interface Asset {
     memo?: Asset.Memo | undefined;
     /** Currency networks */
     networks?: Asset.Networks | undefined;
-    /** Currency limits by each network */
+    /** Currency limits by each network. May be absent from the response. */
     limits?: Asset.Limits | undefined;
     /** Required blockchain confirmations for deposits, mapped by network name (e.g., {"BTC": 2, "ERC20": 20}). Absent for fiat currencies, demo assets, and internal exchange tokens (e.g., UAH, EUR, DBTC, DUSDT). Individual network keys may also be absent if a network was historically supported but is currently disabled. */
     confirmations?: Record<string, number> | undefined;
@@ -59,7 +59,7 @@ export namespace Asset {
     }
 
     /**
-     * Currency limits by each network
+     * Currency limits by each network. May be absent from the response.
      */
     export interface Limits {
         /** Deposits limits */

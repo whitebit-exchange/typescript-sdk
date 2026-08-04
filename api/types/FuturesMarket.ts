@@ -21,7 +21,7 @@ export interface FuturesMarket {
     high?: string | undefined;
     /** Rolling 24-hours lowest transaction price */
     low?: string | undefined;
-    /** Derivative product type for the market. */
+    /** Derivative product type for the market. Currently always `Perpetual`. */
     product_type?: FuturesMarket.ProductType | undefined;
     /** Current open interest in contracts (point-in-time snapshot, not a 24-hour delta or volume). */
     open_interest?: string | undefined;
@@ -33,6 +33,10 @@ export interface FuturesMarket {
     index_currency?: string | undefined;
     /** Predicted funding rate for the next settlement interval. Fluctuates in real time until settlement occurs. See GET /api/v4/public/funding-history/{market} for historical funding rate records. */
     funding_rate?: string | undefined;
+    /** Upper bound that the funding rate can reach for the market. Served from the last successfully refreshed funding snapshot, so a temporary source outage does not drop the field. Returns `null` only when no snapshot has been loaded since service start. */
+    funding_cap?: (string | null) | undefined;
+    /** Lower bound that the funding rate can reach for the market. Served from the last successfully refreshed funding snapshot, so a temporary source outage does not drop the field. Returns `null` only when no snapshot has been loaded since service start. */
+    funding_floor?: (string | null) | undefined;
     /** Unix timestamp in milliseconds of the next funding settlement. 13-digit value (millisecond precision). */
     next_funding_rate_timestamp?: string | undefined;
     /** Leverage brackets defining position size limits. Object keys are leverage multipliers (e.g., "1", "2", "5", "10", "20", "50", "100"). Values are the maximum allowed open position size in USDT equivalent at the corresponding leverage level. */
@@ -44,11 +48,9 @@ export interface FuturesMarket {
 }
 
 export namespace FuturesMarket {
-    /** Derivative product type for the market. */
+    /** Derivative product type for the market. Currently always `Perpetual`. */
     export const ProductType = {
         Perpetual: "Perpetual",
-        Futures: "Futures",
-        Options: "Options",
     } as const;
     export type ProductType = (typeof ProductType)[keyof typeof ProductType];
 }

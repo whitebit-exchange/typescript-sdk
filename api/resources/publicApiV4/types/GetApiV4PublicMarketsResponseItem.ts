@@ -5,7 +5,7 @@ export interface GetApiV4PublicMarketsResponseItem {
     name: string;
     /** Ticker of stock currency */
     stock: string;
-    /** Ticker of money currency */
+    /** Ticker of money currency. Perpetual futures markets report `USDT` as the money currency. */
     money: string;
     /** Maximum number of decimal places for the base (stock) currency quantity. Represented as a stringified integer. */
     stockPrec: string;
@@ -13,9 +13,9 @@ export interface GetApiV4PublicMarketsResponseItem {
     moneyPrec: string;
     /** Maximum number of decimal places used when calculating fees. Represented as a stringified integer. */
     feePrec: string;
-    /** Default maker fee as a decimal ratio (e.g., `"0.001"` = 0.1%). Multiply by 100 to convert to a percentage. */
+    /** Default maker fee as a percentage value (e.g., `"0.1"` means 0.1%). Divide by 100 to convert to a decimal ratio. `GET /api/v4/public/assets` reports `maker_fee` in the same format. */
     makerFee: string;
-    /** Default taker fee as a decimal ratio (e.g., `"0.001"` = 0.1%). Multiply by 100 to convert to a percentage. */
+    /** Default taker fee as a percentage value (e.g., `"0.1"` means 0.1%). Divide by 100 to convert to a decimal ratio. `GET /api/v4/public/assets` reports `taker_fee` in the same format. */
     takerFee: string;
     /** Minimum order quantity in the base (stock) currency. */
     minAmount: string;
@@ -23,14 +23,16 @@ export interface GetApiV4PublicMarketsResponseItem {
     minTotal: string;
     /** Maximum order total (quantity × price) in the quote (money) currency. `"0"` indicates no upper limit. */
     maxTotal: string;
-    /** Indicates whether trading is enabled */
+    /** Indicates whether trading is enabled. The response includes only markets enabled for trading, so the value is always `true`. */
     tradesEnabled: boolean;
     /** Indicates whether margin trading is enabled */
     isCollateral: boolean;
     /** Market type. Possible values: spot, futures, tradfiFutures */
     type: GetApiV4PublicMarketsResponseItem.Type;
-    /** Indicates whether the market is a traditional-finance (TradFi) futures market. Always paired with `type: tradfiFutures`. TradFi futures markets are region-gated and are omitted from the response entirely where not available. */
+    /** Indicates whether the market is a traditional-finance (TradFi) futures market. Always paired with `type: tradfiFutures`. TradFi futures markets are coming soon and are not yet returned; once available they are region-gated and omitted from the response entirely where not available. */
     isTradFiFutures: boolean;
+    /** Announced delisting date as a Unix timestamp in seconds. `null` when no delisting is announced for the market. The field is always present in the response. */
+    delistedAt: number | null;
 }
 
 export namespace GetApiV4PublicMarketsResponseItem {

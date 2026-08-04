@@ -12,18 +12,10 @@ export interface FeeInfo {
     name?: string | undefined;
     /** Payment provider identifiers used as the network parameter value for fiat deposits and withdrawals via the API. See GET /api/v4/public/assets providers field for context. */
     providers?: string[] | undefined;
-    /**
-     * Deposit fee details. This shape applies to crypto assets: `max_amount` (maximum transaction amount, `"0"` means no upper limit), `min_amount` (minimum transaction amount), `fixed` (fixed fee per transaction, `null` if none), `flex` (percentage-based fee — `percent`, `min_fee`, `max_fee` — or `null` if none).
-     *
-     * For fiat assets with providers, this field is instead an object keyed by provider ID (e.g. `EUR_SEPA_BCB`), where each value has `ticker`, `name`, `is_depositable`, `is_api_depositable`, `max_amount`, `min_amount`, `fixed`, and `flex` — the API returns a different shape than `FeeDetails` in that case.
-     */
-    deposit?: WhitebitApi.FeeDetails | undefined;
-    /**
-     * Withdrawal fee details. This shape applies to crypto assets: `max_amount` (maximum transaction amount, `"0"` means no upper limit), `min_amount` (minimum transaction amount), `fixed` (fixed fee per transaction, `null` if none), `flex` (percentage-based fee — `percent`, `min_fee`, `max_fee` — or `null` if none).
-     *
-     * For fiat assets with providers, this field is instead an object keyed by provider ID (e.g. `EUR_SEPA_BCB`), where each value has `ticker`, `name`, `is_withdrawal`, `is_api_withdrawal`, `max_amount`, `min_amount`, `fixed`, and `flex` — the API returns a different shape than `FeeDetails` in that case.
-     */
-    withdraw?: WhitebitApi.FeeDetails | undefined;
+    /** Deposit fee details. For crypto assets, this is a flat object with `max_amount`, `min_amount`, `fixed`, and `flex` fields. For fiat assets with providers, this is an object keyed by provider ID, where each value contains provider-specific fee details. */
+    deposit?: FeeInfo.Deposit | undefined;
+    /** Withdrawal fee details. For crypto assets, this is a flat object with `max_amount`, `min_amount`, `fixed`, and `flex` fields. For fiat assets with providers, this is an object keyed by provider ID, where each value contains provider-specific fee details. */
+    withdraw?: FeeInfo.Withdraw | undefined;
     /** Indicates whether deposits are enabled for the currency. May be absent from the response; absence should be treated as equivalent to false. */
     is_depositable?: boolean | undefined;
     /** Indicates whether withdrawals are enabled for the currency. May be absent from the response; absence should be treated as equivalent to false. */
@@ -32,4 +24,23 @@ export interface FeeInfo {
     is_api_withdrawal?: boolean | undefined;
     /** Whether API deposits are enabled */
     is_api_depositable?: boolean | undefined;
+}
+
+export namespace FeeInfo {
+    /**
+     * Deposit fee details. For crypto assets, this is a flat object with `max_amount`, `min_amount`, `fixed`, and `flex` fields. For fiat assets with providers, this is an object keyed by provider ID, where each value contains provider-specific fee details.
+     */
+    export type Deposit =
+        | WhitebitApi.FeeDetails
+        /**
+         * Map of provider IDs to provider-specific deposit fee details */
+        | Record<string, WhitebitApi.ProviderFeeDetails>;
+    /**
+     * Withdrawal fee details. For crypto assets, this is a flat object with `max_amount`, `min_amount`, `fixed`, and `flex` fields. For fiat assets with providers, this is an object keyed by provider ID, where each value contains provider-specific fee details.
+     */
+    export type Withdraw =
+        | WhitebitApi.FeeDetails
+        /**
+         * Map of provider IDs to provider-specific withdrawal fee details */
+        | Record<string, WhitebitApi.ProviderFeeDetails>;
 }

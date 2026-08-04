@@ -4,7 +4,8 @@
  * @example
  *     {
  *         type: 1,
- *         subAccountId: "8e667b4a-0b71-4988-8af5-9474dbfaeb51"
+ *         subAccountId: "8e667b4a-0b71-4988-8af5-9474dbfaeb51",
+ *         title: "Trading Bot Key"
  *     }
  */
 export interface CreateSubAccountApiKeyRequest {
@@ -13,5 +14,5 @@ export interface CreateSubAccountApiKeyRequest {
     /** ID of the sub-account to create the API key for */
     subAccountId: string;
     /** Custom title/name for the API key */
-    title?: string;
+    title: string;
 }

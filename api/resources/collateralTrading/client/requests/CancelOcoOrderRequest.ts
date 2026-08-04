@@ -4,14 +4,18 @@
  * @example
  *     {
  *         market: "BTC_USDT",
- *         orderId: 117703764514,
+ *         orderId: 117703764513,
  *         request: "{{request}}",
  *         nonce: 1594297865000
  *     }
  */
 export interface CancelOcoOrderRequest {
+    /** Market of the OCO order to cancel. Example: BTC_USDT */
     market: string;
-    orderId: number;
+    /** OCO order identifier (the `id` returned at creation and by the OCO listings). Required if `clientOrderId` is not set; mutually exclusive with `clientOrderId`. */
+    orderId?: number;
+    /** Client-defined order ID supplied at order creation. Required if `orderId` is not set; mutually exclusive with `orderId`. */
+    clientOrderId?: string;
     request: string;
     nonce: number;
 }

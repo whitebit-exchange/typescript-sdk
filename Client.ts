@@ -4,11 +4,14 @@ import * as WhitebitApi from "./api/index.js";
 import { CodesClient } from "./api/resources/codes/client/Client.js";
 import { CollateralTradingClient } from "./api/resources/collateralTrading/client/Client.js";
 import { CreditLineClient } from "./api/resources/creditLine/client/Client.js";
+import { CryptoLendingFixedClient } from "./api/resources/cryptoLendingFixed/client/Client.js";
+import { CryptoLendingFlexClient } from "./api/resources/cryptoLendingFlex/client/Client.js";
 import { DepositClient } from "./api/resources/deposit/client/Client.js";
 import { FeesClient } from "./api/resources/fees/client/Client.js";
 import { JwtClient } from "./api/resources/jwt/client/Client.js";
 import { MainAccountClient } from "./api/resources/mainAccount/client/Client.js";
 import { MarketFeeClient } from "./api/resources/marketFee/client/Client.js";
+import { MiningPoolClient } from "./api/resources/miningPool/client/Client.js";
 import { PublicApiV4Client } from "./api/resources/publicApiV4/client/Client.js";
 import { SpotTradingClient } from "./api/resources/spotTrading/client/Client.js";
 import { SubAccountClient } from "./api/resources/subAccount/client/Client.js";
@@ -39,9 +42,12 @@ export class WhitebitApiClient {
     protected _withdraw: WithdrawClient | undefined;
     protected _transfer: TransferClient | undefined;
     protected _codes: CodesClient | undefined;
+    protected _cryptoLendingFixed: CryptoLendingFixedClient | undefined;
+    protected _cryptoLendingFlex: CryptoLendingFlexClient | undefined;
     protected _fees: FeesClient | undefined;
     protected _subAccount: SubAccountClient | undefined;
     protected _subAccountApiKeys: SubAccountApiKeysClient | undefined;
+    protected _miningPool: MiningPoolClient | undefined;
     protected _creditLine: CreditLineClient | undefined;
     protected _travelRule: TravelRuleClient | undefined;
     protected _collateralTrading: CollateralTradingClient | undefined;
@@ -80,6 +86,14 @@ export class WhitebitApiClient {
         return (this._codes ??= new CodesClient(this._options));
     }
 
+    public get cryptoLendingFixed(): CryptoLendingFixedClient {
+        return (this._cryptoLendingFixed ??= new CryptoLendingFixedClient(this._options));
+    }
+
+    public get cryptoLendingFlex(): CryptoLendingFlexClient {
+        return (this._cryptoLendingFlex ??= new CryptoLendingFlexClient(this._options));
+    }
+
     public get fees(): FeesClient {
         return (this._fees ??= new FeesClient(this._options));
     }
@@ -90,6 +104,10 @@ export class WhitebitApiClient {
 
     public get subAccountApiKeys(): SubAccountApiKeysClient {
         return (this._subAccountApiKeys ??= new SubAccountApiKeysClient(this._options));
+    }
+
+    public get miningPool(): MiningPoolClient {
+        return (this._miningPool ??= new MiningPoolClient(this._options));
     }
 
     public get creditLine(): CreditLineClient {

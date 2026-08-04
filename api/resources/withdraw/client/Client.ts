@@ -70,51 +70,12 @@ export class WithdrawClient {
      *
      * @example
      *     await client.withdraw.createWithdraw({
-     *         ticker: "UAH",
-     *         amount: "100",
-     *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
-     *         uniqueId: "24529043",
-     *         provider: "VISAMASTER",
-     *         request: "{{request}}",
-     *         nonce: 1594297865000
-     *     })
-     *
-     * @example
-     *     await client.withdraw.createWithdraw({
      *         ticker: "USD",
      *         amount: "150.00",
      *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
      *         uniqueId: "ab12cd34-9101-4abc-9def-1234567890ab",
      *         provider: "VISAMASTER",
      *         customerIp: "203.0.113.42",
-     *         request: "{{request}}",
-     *         nonce: 1594297865000
-     *     })
-     *
-     * @example
-     *     await client.withdraw.createWithdraw({
-     *         ticker: "UAH",
-     *         amount: "50000",
-     *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
-     *         uniqueId: "24529045",
-     *         provider: "VISAMASTER_PAYCORE",
-     *         partialEnable: true,
-     *         request: "{{request}}",
-     *         nonce: 1594297865000
-     *     })
-     *
-     * @example
-     *     await client.withdraw.createWithdraw({
-     *         ticker: "UAH",
-     *         amount: "50000",
-     *         address: "UA213223130000026007233566001",
-     *         uniqueId: "24529045",
-     *         provider: "UAH_IBAN",
-     *         beneficiary: {
-     *             firstName: "Firstname",
-     *             lastName: "Lastname",
-     *             tin: 1000000000
-     *         },
      *         request: "{{request}}",
      *         nonce: 1594297865000
      *     })

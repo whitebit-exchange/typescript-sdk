@@ -7,8 +7,8 @@ export interface GetKillSwitchStatusResponseItem {
     startTime?: number | undefined;
     /** Unix timestamp (seconds) when the kill-switch will cancel orders. Equals `startTime + timeout`. */
     cancellationTime?: number | undefined;
-    /** Order types targeted by the kill-switch. Possible values: `spot`, `margin`, `futures`. */
-    types?: GetKillSwitchStatusResponseItem.Types.Item[] | undefined;
+    /** Order types targeted by the kill-switch. Possible values: `spot`, `margin`, `futures`. Returns `null` when the timer was created without `types` (the kill-switch then targets all order types). */
+    types?: (GetKillSwitchStatusResponseItem.Types.Item[] | null) | undefined;
 }
 
 export namespace GetKillSwitchStatusResponseItem {

@@ -1328,6 +1328,125 @@ export class CollateralTradingClient {
     }
 
     /**
+     * The endpoint returns one aggregated profit-and-loss record per closed [collateral](/glossary#balance-collateral) position for the authenticated account — the same closed-position PNL the trading terminal shows. Records are sorted by `closeDate` descending, then `positionId` descending. Use the optional `startDate` and `endDate` parameters to narrow the window; the filter applies to the position close time.
+     *
+     * <Note>
+     * The endpoint supports pagination via `limit` (default: 50, max: 100) and `offset` (default: 0); the sum of `offset` and `limit` must not exceed 10000. A response that returns fewer than `limit` records indicates the last page.
+     * </Note>
+     *
+     * <Note>
+     * **Close-time windowing:** a position opened before the requested window but closed inside the window returns complete aggregates — fees, average prices, and closed size cover the full position lifetime, not only the requested window.
+     * </Note>
+     *
+     * <Warning>
+     * Rate limit: 12000 requests/10 sec.
+     * </Warning>
+     *
+     * <Accordion title="Error Codes">
+     *   - `30` - default validation error code (invalid pagination — `limit` outside 1–100, or `offset` + `limit` above 10000 — or a date filter that violates `startDate` ≤ `endDate` ≤ `now + 1s`)
+     * </Accordion>
+     *
+     * @param {WhitebitApi.GetClosedPositionsPnlRequest} request
+     * @param {CollateralTradingClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.UnprocessableEntityError}
+     * @throws {@link WhitebitApi.InternalServerError}
+     * @throws {@link WhitebitApi.ServiceUnavailableError}
+     *
+     * @example
+     *     await client.collateralTrading.getClosedPositionsPnl({
+     *         startDate: 1778000000,
+     *         endDate: 1778100000,
+     *         limit: 50,
+     *         offset: 0,
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
+     *     })
+     */
+    public getClosedPositionsPnl(
+        request: WhitebitApi.GetClosedPositionsPnlRequest = {},
+        requestOptions?: CollateralTradingClient.RequestOptions,
+    ): core.HttpResponsePromise<WhitebitApi.GetClosedPositionsPnlResponseItem[]> {
+        return core.HttpResponsePromise.fromPromise(this.__getClosedPositionsPnl(request, requestOptions));
+    }
+
+    private async __getClosedPositionsPnl(
+        request: WhitebitApi.GetClosedPositionsPnlRequest = {},
+        requestOptions?: CollateralTradingClient.RequestOptions,
+    ): Promise<core.WithRawResponse<WhitebitApi.GetClosedPositionsPnlResponseItem[]>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-TXC-PAYLOAD": requestOptions?.txcPayload ?? this._options?.txcPayload,
+                "X-TXC-SIGNATURE": requestOptions?.txcSignature ?? this._options?.txcSignature,
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (
+                        (await core.Supplier.get(this._options.environment)) ??
+                        environments.WhitebitApiEnvironment.Default
+                    ).base,
+                "api/v4/collateral-account/positions/closed-pnl",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as WhitebitApi.GetClosedPositionsPnlResponseItem[],
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 422:
+                    throw new WhitebitApi.UnprocessableEntityError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new WhitebitApi.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                case 503:
+                    throw new WhitebitApi.ServiceUnavailableError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.WhitebitApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/api/v4/collateral-account/positions/closed-pnl",
+        );
+    }
+
+    /**
      * The endpoint returns the funding rate payment history for [collateral](/glossary#balance-collateral) positions. Each record includes the funding rate, settlement price, position amount, and the resulting funding payment. Use the optional `market` parameter to filter results to a single trading pair. The response supports pagination via `limit` and `offset` parameters. Results are ordered by funding time (`fundingTime`), newest first.
      *
      * <Warning>
@@ -2226,14 +2345,14 @@ export class CollateralTradingClient {
     public cancelConditionalOrder(
         request: WhitebitApi.CancelConditionalOrderRequest,
         requestOptions?: CollateralTradingClient.RequestOptions,
-    ): core.HttpResponsePromise<void> {
+    ): core.HttpResponsePromise<unknown[]> {
         return core.HttpResponsePromise.fromPromise(this.__cancelConditionalOrder(request, requestOptions));
     }
 
     private async __cancelConditionalOrder(
         request: WhitebitApi.CancelConditionalOrderRequest,
         requestOptions?: CollateralTradingClient.RequestOptions,
-    ): Promise<core.WithRawResponse<void>> {
+    ): Promise<core.WithRawResponse<unknown[]>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -2266,7 +2385,7 @@ export class CollateralTradingClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: undefined, rawResponse: _response.rawResponse };
+            return { data: _response.body as unknown[], rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -2301,16 +2420,16 @@ export class CollateralTradingClient {
     }
 
     /**
-     * The endpoint cancels an OCO order.
+     * The endpoint cancels an OCO order. Identify the order by `orderId` or `clientOrderId` — exactly one of the two must be provided. A request specifying both identifiers, or neither, fails validation.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
      * </Warning>
      *
      * <Accordion title="Error Codes">
-     *   - `30` - default validation error code
+     *   - `30` - default validation error code. Also returned when the request specifies both `orderId` and `clientOrderId`, or neither
      *   - `31` - market validation failed
-     *   - `2` - OCO order not found. Returned whether the `orderId` does not exist, or the order was already filled or already cancelled — these cases are not distinguished
+     *   - `2` - OCO order not found. Returned whether the identifier (`orderId` or `clientOrderId`) does not exist, or the order was already filled or already cancelled — these cases are not distinguished
      * </Accordion>
      *
      * <Accordion title="Errors">
@@ -2335,7 +2454,7 @@ export class CollateralTradingClient {
      * @example
      *     await client.collateralTrading.cancelOcoOrder({
      *         market: "BTC_USDT",
-     *         orderId: 117703764514,
+     *         orderId: 117703764513,
      *         request: "{{request}}",
      *         nonce: 1594297865000
      *     })
@@ -2455,14 +2574,14 @@ export class CollateralTradingClient {
     public cancelOtoOrder(
         request: WhitebitApi.CancelOtoOrderRequest,
         requestOptions?: CollateralTradingClient.RequestOptions,
-    ): core.HttpResponsePromise<void> {
+    ): core.HttpResponsePromise<unknown[]> {
         return core.HttpResponsePromise.fromPromise(this.__cancelOtoOrder(request, requestOptions));
     }
 
     private async __cancelOtoOrder(
         request: WhitebitApi.CancelOtoOrderRequest,
         requestOptions?: CollateralTradingClient.RequestOptions,
-    ): Promise<core.WithRawResponse<void>> {
+    ): Promise<core.WithRawResponse<unknown[]>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -2495,7 +2614,7 @@ export class CollateralTradingClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: undefined, rawResponse: _response.rawResponse };
+            return { data: _response.body as unknown[], rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {

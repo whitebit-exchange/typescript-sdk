@@ -23,6 +23,31 @@ export interface ModifyOrderRequest {
     price?: string;
     /** Activation price in [money](/glossary#money) currency. Example: '10000' or 10000 */
     activationPrice?: string;
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
+    stp?: ModifyOrderRequest.Stp;
     request: string;
     nonce: number;
+}
+
+export namespace ModifyOrderRequest {
+    /**
+     * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
+     *
+     * Legacy values `cancel_both`, `cancel_new`, `cancel_old` are deprecated: the API accepts the legacy values with identical behavior until a deprecation deadline is announced, then rejects the legacy values. Responses always return the abbreviated form, regardless of which variant the request used.
+     *
+     * See [Self-Trade Prevention](/platform/self-trade-prevention).
+     */
+    export const Stp = {
+        No: "no",
+        Cb: "cb",
+        Cn: "cn",
+        Co: "co",
+    } as const;
+    export type Stp = (typeof Stp)[keyof typeof Stp];
 }

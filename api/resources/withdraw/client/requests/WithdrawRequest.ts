@@ -30,7 +30,7 @@ export interface WithdrawRequest {
     partialEnable?: boolean;
     /** End-customer IP address forwarded to the [fiat](/glossary#fiat) [provider](/glossary#provider) for antifraud checks before the withdrawal is processed. ⚠️ Required if currency [ticker](/glossary#ticker) is USD or EUR with VISAMASTER [provider](/glossary#provider). */
     customerIp?: string;
-    /** Beneficiary information data. Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR */
+    /** Beneficiary information data. Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, EUR_VISAMASTER, USD, EUR */
     beneficiary?: Record<string, unknown>;
     /** Travel Rule information data. Required if currency is crypto and the account is from [EEA](/glossary#european-economic-area-eea) */
     travelRule?: Record<string, unknown>;

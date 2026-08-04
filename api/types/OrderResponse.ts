@@ -2,6 +2,9 @@
 
 import type * as WhitebitApi from "../index.js";
 
+/**
+ * Shared order shape returned by the order-creation, cancel, active-orders list, and modify endpoints. Field presence varies by endpoint and order type — see the per-field notes.
+ */
 export interface OrderResponse {
     /** Unique identifier assigned to the order by the matching engine. */
     orderId?: number | undefined;
@@ -25,24 +28,28 @@ export interface OrderResponse {
     left?: string | undefined;
     /** Cumulative trading fee charged for filled portions, denominated in the fee asset. */
     dealFee?: string | undefined;
-    /** Limit price per unit in quote currency. Returns `"0"` for market orders. */
+    /** Currency ticker of the asset used to pay the trading fee. Omitted when empty. */
+    feeAsset?: string | undefined;
+    /** Limit price per unit in quote currency. Present for orders that carry a price (limit and stop-limit shapes); omitted on market and stop-market order shapes. */
     price?: string | undefined;
-    /** Post-only flag. When `true`, the order executes only as a maker order and is rejected if it would match immediately. Default: `false`. */
+    /** Post-only flag. When `true`, the order executes only as a maker order and is rejected if it would match immediately. Omitted when not set. */
     postOnly?: boolean | undefined;
     /** Immediate-or-cancel flag. When `true`, the order executes available quantity immediately and cancels the unfilled remainder. Default: `false`. */
     ioc?: boolean | undefined;
     status?: WhitebitApi.OrderStatus | undefined;
     /** Self-trade prevention mode applied to the order. Possible values: `no`, `cb`, `cn`, `co`. The response always returns the abbreviated form, even when the request used a legacy value. Default: `no`. */
     stp?: string | undefined;
-    /** Position side (for collateral orders) */
+    /** Position side (for collateral orders). Returned on the cancel, active-orders list, and modify responses; omitted when not set. Spot order-creation responses do not include the field. */
     positionSide?: string | undefined;
+    /** OTO order data. Present only when the order belongs to an [OTO](/glossary#one-triggers-the-other-oto) group — returned on the cancel, active-orders list, and modify responses. */
+    oto?: OrderResponse.Oto | undefined;
     /** Indicates Retail Price Improvement (RPI) mode for the order. */
     rpi?: boolean | undefined;
     /** Retail-source taker flag. The field is present only when the order was placed with `retail=true`. See [Retail flag](/glossary#retail-flag). */
     retail?: boolean | undefined;
-    /** Reduce-only flag. When `true`, the order can only reduce or close an existing position. See [reduce-only](/glossary#reduce-only). */
+    /** Reduce-only flag. When `true`, the order can only reduce or close an existing position. Returned on the cancel, active-orders list, and modify responses; spot order-creation responses do not include the field. See [reduce-only](/glossary#reduce-only). */
     reduceOnly?: boolean | undefined;
-    /** Activation status of the stop order. 0 = not yet triggered (waiting for the activation_price condition to be met). 1 = triggered (the stop condition has been met and the order is now active). */
+    /** Activation status of the stop order. 0 = not yet triggered (waiting for the activation_price condition to be met). 1 = triggered (the stop condition has been met and the order is now active). Returned for stop orders; omitted on other order shapes. */
     activated?: number | undefined;
     /**
      * Trigger condition for the stop order. Response-only — not accepted in the request body, and cannot be overridden. Derived from `side`:
@@ -51,11 +58,23 @@ export interface OrderResponse {
      * - `side = sell` → `lte`. The order activates when the market price falls to or below `activation_price`.
      */
     activationCondition?: OrderResponse.ActivationCondition | undefined;
-    /** The trigger price for the stop order. Always equals the activation_price value submitted in the request. */
+    /** The trigger price for the stop order. Always equals the activation_price value submitted in the request. Returned for stop orders; omitted on other order shapes. */
     activation_price?: string | undefined;
 }
 
 export namespace OrderResponse {
+    /**
+     * OTO order data. Present only when the order belongs to an [OTO](/glossary#one-triggers-the-other-oto) group — returned on the cancel, active-orders list, and modify responses.
+     */
+    export interface Oto {
+        /** OTO order identifier */
+        otoId?: number | undefined;
+        /** Take profit order price */
+        takeProfit?: string | undefined;
+        /** Stop loss order price */
+        stopLoss?: string | undefined;
+    }
+
     /**
      * Trigger condition for the stop order. Response-only — not accepted in the request body, and cannot be overridden. Derived from `side`:
      *

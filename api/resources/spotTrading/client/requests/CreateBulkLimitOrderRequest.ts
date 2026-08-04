@@ -35,12 +35,14 @@ import type * as WhitebitApi from "../../../../index.js";
  *                 clientOrderId: "",
  *                 rpi: false,
  *                 retail: false
- *             }]
+ *             }],
+ *         request: "{{request}}",
+ *         nonce: 1594297865000
  *     }
  */
 export interface CreateBulkLimitOrderRequest {
-    /** Array of limit orders */
-    orders?: WhitebitApi.BulkOrderItem[];
+    /** Array of limit orders. Each item is validated with the same rules as a single limit order. */
+    orders: WhitebitApi.BulkOrderItem[];
     /**
      * Controls how the bulk order processor handles failures.
      *
@@ -49,6 +51,6 @@ export interface CreateBulkLimitOrderRequest {
      * When false (default): All orders in the bulk request are processed regardless of individual failures. Each order result is returned in the response array.
      */
     stopOnFail?: boolean;
-    request?: string;
-    nonce?: number;
+    request: string;
+    nonce: number;
 }

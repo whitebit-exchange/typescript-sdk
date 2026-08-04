@@ -3,15 +3,19 @@
 /**
  * @example
  *     {
- *         market: "BTC_USDT",
- *         timeout: "60"
+ *         market: "BTC_USDT"
+ *     }
+ *
+ * @example
+ *     {
+ *         market: "BTC_USDT"
  *     }
  */
 export interface SetKillSwitchRequest {
     /** Available [market](/glossary#market). Example: BTC_USDT */
     market: string;
-    /** Timer value. Example: '5'-'600' or null */
-    timeout: string;
+    /** Timer value in seconds ('5'-'600'), or `null` to delete the existing timer. The key must always be present — omitting it fails validation. */
+    timeout: string | null;
     /** Order types to target. Valid values: "spot" — standard spot orders. "margin" — marginal orders placed on spot markets. Note: the "margin" value is not the same as the collateral account balance; "collateral" in other endpoints refers to the funding account, whereas "margin" here refers specifically to the order type. "futures" — marginal orders placed on futures markets (e.g., BTC_PERP). If omitted, the API targets all order types. */
     types?: SetKillSwitchRequest.Types.Item[];
     request?: string;

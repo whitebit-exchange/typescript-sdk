@@ -6,7 +6,6 @@
  *         market: "BTC_USDT",
  *         side: "buy",
  *         amount: "0.001",
- *         price: "9800",
  *         request: "{{request}}",
  *         nonce: 1594297865000
  *     }
@@ -18,22 +17,29 @@ export interface LimitOrderRequest {
     side: LimitOrderRequest.Side;
     /** Order quantity in base (stock) currency. Minimum and maximum values are market-dependent. Query `GET /api/v4/public/markets` for `minAmount`, `minTotal`, `maxTotal`. Precision: `stockPrec`. */
     amount: string;
-    /** Limit price per unit in quote (money) currency. Minimum and maximum values are market-dependent. Precision: `moneyPrec`. */
-    price: string;
+    /** Limit price per unit in quote (money) currency. Required unless `bboRole` is set — the BBO execution method replaces the explicit price. Minimum and maximum values are market-dependent. Precision: `moneyPrec`. */
+    price?: string;
     /** Custom client order identifier. Uniqueness is enforced only among the account's open (pending) orders on the same market — once a previous order is filled or canceled, the same identifier can be reused, including on the same market. Contains only letters, numbers, dashes, dots, or underscores. */
     clientOrderId?: string;
-    /** Post-only flag. When `true`, the order executes only as a [maker](/glossary#maker) order and the system rejects the order if it would match immediately. Default: `false`. */
+    /** Post-only flag. When `true`, the order executes only as a [maker](/glossary#maker) order and the system rejects the order if it would match immediately. Allowed only when `bboRole` is not set. Do not combine with `rpi=true` — RPI orders apply post-only behavior automatically, and a request setting both flags fails validation. Default: `false`. */
     postOnly?: boolean;
     /**
      * Immediate-or-cancel (IOC) flag. When `true`, the matching engine executes all or part of the order immediately and cancels any unfilled portion. Default: `false`.
      *
      * IOC does not support `rpi=true` because RPI uses post-only behavior by design.
      * The API returns error code `40` when a request sets both `ioc=true` and `rpi=true`.
+     * IOC cannot be combined with `postOnly=true` (error code `37`), and with `bboRole` it is allowed only for the Counterparty method (`2`).
      *
      * Refer to [Order Parameter Rules](/guides/order-parameter-rules) for unsupported parameter combinations.
      */
     ioc?: boolean;
-    /** Best Bid/Offer ([BBO](/glossary#bbo)) execution method. The system selects the best market price for execution. `1` = Queue method, `2` = Counterparty method. Use method `2` with the `ioc` flag. */
+    /**
+     * Best Bid/Offer ([BBO](/glossary#best-bid-offer-bbo)) execution method. The system selects the best market price for execution. `1` = Queue method, `2` = Counterparty method.
+     *
+     * When `bboRole` is set, `price` is not required — the BBO method determines the execution price. `postOnly` is allowed only when `bboRole` is not set; `ioc` can be combined only with the Counterparty method (`2`). Use method `2` with the `ioc` flag.
+     *
+     * Refer to [Order Parameter Rules](/guides/order-parameter-rules) for the full interaction rules.
+     */
     bboRole?: number;
     /**
      * Self-trade prevention mode. Allowed values: `no` (self-trades allowed), `cb` (cancel both the new and the existing order), `cn` (cancel the new order, keep the existing), `co` (cancel the existing order, place the new one). Default: `no`.
@@ -46,7 +52,7 @@ export interface LimitOrderRequest {
     /**
      * Enables Retail Price Improvement (RPI) mode. Default: `false`.
      *
-     * RPI orders use post-only behavior by design. An RPI order does not support `ioc=true`.
+     * RPI orders apply post-only behavior automatically — do not also send an explicit `postOnly=true`: a request combining the two flags fails validation. An RPI order does not support `ioc=true`.
      * The API returns error code `40` when a request sets both `rpi=true` and `ioc=true`.
      * RPI orders do not appear in public order book feeds (`depth`, `bookTicker`). RPI orders are visible only in private active orders and in the exchange UI order book (web/mobile).
      * RPI executions may apply custom fees or rebates, especially when trading via sub-accounts. Use Query Market Fees to verify effective fees.

@@ -7,9 +7,10 @@
  *   import { createHmacFetch } from "@whitebit/sdk/auth";
  *
  *   const client = new WhitebitApiClient({
- *     txcApikey: "YOUR_API_KEY",
- *     token:     "YOUR_TOKEN",
- *     fetch:     createHmacFetch("YOUR_API_SECRET"),
+ *     apiKey: "YOUR_API_KEY",
+ *     txcPayload: "",
+ *     txcSignature: "",
+ *     fetch: createHmacFetch("YOUR_API_SECRET"),
  *   });
  */
 export function createHmacFetch(apiSecret: string): typeof fetch {
@@ -39,8 +40,19 @@ export function createHmacFetch(apiSecret: string): typeof fetch {
             return fetch(input, init);
         }
 
-        if (body["nonce"] == null)       body["nonce"]       = Date.now();
-        if (body["request"] == null)     body["request"]     = path;
+        // request/nonce: fill if falsy, not just if absent. Some endpoints'
+        // generated request types declare request/nonce as required (OpenAPI
+        // marks them required for the wire contract, since they're mandatory
+        // for non-SDK callers), so they're always serialized as their zero
+        // value ("", 0) when the caller doesn't set them — which an "== null"
+        // presence check would never catch. "" and 0 are never legitimate
+        // caller-supplied values for these two fields, so treating them as
+        // absent is safe and still lets an explicitly-set nonce survive.
+        if (!body["request"]) body["request"] = path;
+        if (!body["nonce"]) body["nonce"] = Date.now();
+        // nonceWindow is genuinely optional in every spec and defaults to
+        // false server-side — an explicit `nonceWindow: false` from the
+        // caller must survive, so only fill it in when the key is missing.
         if (body["nonceWindow"] == null) body["nonceWindow"] = true;
 
         const serialized = JSON.stringify(body);

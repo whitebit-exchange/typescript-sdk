@@ -13,68 +13,27 @@ export type GetConditionalOrdersResponseRecordsItem =
 export namespace GetConditionalOrdersResponseRecordsItem {
     export interface Oco {
         type: "oco";
+        /** Conditional order identifier */
         id?: number | undefined;
-        /** Reduce-only flag */
-        reduceOnly?: boolean | undefined;
-        stopLoss?: GetConditionalOrdersResponseRecordsItemOco.StopLoss | undefined;
-        takeProfit?: GetConditionalOrdersResponseRecordsItemOco.TakeProfit | undefined;
-    }
-
-    export namespace GetConditionalOrdersResponseRecordsItemOco {
-        export interface StopLoss {
-            orderId?: number | undefined;
-            positionSide?: StopLoss.PositionSide | undefined;
-        }
-
-        export namespace StopLoss {
-            export const PositionSide = {
-                Long: "LONG",
-                Short: "SHORT",
-                Both: "BOTH",
-            } as const;
-            export type PositionSide = (typeof PositionSide)[keyof typeof PositionSide];
-        }
-
-        export interface TakeProfit {
-            orderId?: number | undefined;
-            positionSide?: TakeProfit.PositionSide | undefined;
-        }
-
-        export namespace TakeProfit {
-            export const PositionSide = {
-                Long: "LONG",
-                Short: "SHORT",
-                Both: "BOTH",
-            } as const;
-            export type PositionSide = (typeof PositionSide)[keyof typeof PositionSide];
-        }
+        /** Conditional order subtype. Omitted when not set. */
+        conditionalOrderType?: string | undefined;
+        /** Stop-loss leg of the OCO order. The `reduceOnly` flag is returned per leg. */
+        stopLoss?: WhitebitApi.ConditionalOrderLeg | undefined;
+        /** Take-profit leg of the OCO order. The `reduceOnly` flag is returned per leg. */
+        takeProfit?: WhitebitApi.ConditionalOrderLeg | undefined;
     }
 
     export interface Oto {
         type: "oto";
+        /** Conditional order identifier */
         id?: number | undefined;
-        /** Reduce-only flag */
-        reduceOnly?: boolean | undefined;
+        /** Conditional order subtype. Omitted when not set. */
+        conditionalOrderType?: string | undefined;
+        /** Stop loss order price */
         stopLossPrice?: string | undefined;
+        /** Take profit order price */
         takeProfitPrice?: string | undefined;
-        conditionalOrder?: GetConditionalOrdersResponseRecordsItemOto.ConditionalOrder | undefined;
-    }
-
-    export namespace GetConditionalOrdersResponseRecordsItemOto {
-        export interface ConditionalOrder {
-            orderId?: number | undefined;
-            clientOrderId?: string | undefined;
-            market?: string | undefined;
-            positionSide?: ConditionalOrder.PositionSide | undefined;
-        }
-
-        export namespace ConditionalOrder {
-            export const PositionSide = {
-                Long: "LONG",
-                Short: "SHORT",
-                Both: "BOTH",
-            } as const;
-            export type PositionSide = (typeof PositionSide)[keyof typeof PositionSide];
-        }
+        /** The linked active order. Same shape as an `/api/v4/orders` record, including its per-order `reduceOnly` flag. */
+        conditionalOrder?: WhitebitApi.OrderResponse | undefined;
     }
 }

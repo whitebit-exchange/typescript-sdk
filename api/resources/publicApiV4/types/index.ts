@@ -2,6 +2,7 @@ export * from "./GetApiV4PublicCollateralMarketsResponse.js";
 export * from "./GetApiV4PublicFundingHistoryMarketResponseItem.js";
 export * from "./GetApiV4PublicFuturesResponse.js";
 export * from "./GetApiV4PublicMarketsResponseItem.js";
+export * from "./GetApiV4PublicMiningPoolResponse.js";
 export * from "./GetApiV4PublicPlatformStatusResponse.js";
 export * from "./GetApiV4PublicTimeResponse.js";
 export * from "./GetApiV4PublicTradesMarketRequestType.js";

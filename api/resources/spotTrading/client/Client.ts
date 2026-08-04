@@ -171,6 +171,7 @@ export class SpotTradingClient {
      * <Note>
      *   - RPI orders do not appear in public order book feeds (`depth`, `bookTicker`). RPI orders are visible only in private active orders and in the exchange UI order book (web/mobile).
      *   - RPI orders are post-only by design and cannot be used with the IOC flag. The API returns error code `40` when both `rpi=true` and `ioc=true` are used.
+     *   - RPI orders apply post-only behavior automatically — do not also send `postOnly=true`: a request combining `rpi=true` with an explicit `postOnly=true` fails validation.
      *   - `retail=true` marks the order as a retail-source taker eligible to match RPI-maker liquidity. The Retail flag must be enabled on the account; contact the account manager to enable it.
      *   - `retail=true` and `rpi=true` cannot be combined. The API returns error code `41` when both flags are set.
      *   - `retail=true` has no effect on a `postOnly=true` order. Post-only orders are makers and cannot be retail takers.
@@ -395,7 +396,6 @@ export class SpotTradingClient {
      *         market: "BTC_USDT",
      *         side: "buy",
      *         amount: "0.001",
-     *         price: "9800",
      *         request: "{{request}}",
      *         nonce: 1594297865000
      *     })
@@ -482,6 +482,7 @@ export class SpotTradingClient {
      * <Note>
      *   - RPI orders do not appear in public order book feeds (`depth`, `bookTicker`). RPI orders are visible only in private active orders and in the exchange UI order book (web/mobile).
      *   - RPI orders are post-only by design and cannot be used with the IOC flag. The API returns error code `40` when both `rpi=true` and `ioc=true` are used.
+     *   - RPI orders apply post-only behavior automatically — do not also send `postOnly=true`: a request combining `rpi=true` with an explicit `postOnly=true` fails validation.
      *   - `retail=true` marks the order as a retail-source taker eligible to match RPI-maker liquidity. The Retail flag must be enabled on the account; contact the account manager to enable it.
      *   - `retail=true` and `rpi=true` cannot be combined. The API returns error code `41` when both flags are set on an item.
      *   - `retail=true` has no effect on a `postOnly=true` item. Post-only orders are makers and cannot be retail takers.
@@ -617,18 +618,20 @@ export class SpotTradingClient {
      *                 clientOrderId: "",
      *                 rpi: false,
      *                 retail: false
-     *             }]
+     *             }],
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
      *     })
      */
     public createBulkLimitOrder(
-        request: WhitebitApi.CreateBulkLimitOrderRequest = {},
+        request: WhitebitApi.CreateBulkLimitOrderRequest,
         requestOptions?: SpotTradingClient.RequestOptions,
     ): core.HttpResponsePromise<WhitebitApi.BulkLimitOrderResponse> {
         return core.HttpResponsePromise.fromPromise(this.__createBulkLimitOrder(request, requestOptions));
     }
 
     private async __createBulkLimitOrder(
-        request: WhitebitApi.CreateBulkLimitOrderRequest = {},
+        request: WhitebitApi.CreateBulkLimitOrderRequest,
         requestOptions?: SpotTradingClient.RequestOptions,
     ): Promise<core.WithRawResponse<WhitebitApi.BulkLimitOrderResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
@@ -1230,7 +1233,6 @@ export class SpotTradingClient {
      *         market: "BTC_USDT",
      *         side: "buy",
      *         amount: "0.001",
-     *         price: "9800",
      *         activation_price: "10000",
      *         request: "{{request}}",
      *         nonce: 1594297865000
@@ -1538,9 +1540,8 @@ export class SpotTradingClient {
      * </Warning>
      *
      * <Note>
-     * - Cancellation by clientOrderId takes priority over orderId.
-     * - The request supports working only with orderId or only with clientOrderId.
-     * - Do not pass both values at the same time.
+     * - The request accepts exactly one identifier: either `orderId` or `clientOrderId`.
+     * - Sending both identifiers, or neither, returns a validation error.
      * </Note>
      *
      * <Accordion title="Error Codes">
@@ -1982,20 +1983,22 @@ export class SpotTradingClient {
      * @example
      *     await client.spotTrading.cancelAllOrders({
      *         market: "BTC_USDT",
-     *         type: ["spot", "margin", "futures"]
+     *         type: ["spot", "margin", "futures"],
+     *         request: "{{request}}",
+     *         nonce: 1594297865000
      *     })
      */
     public cancelAllOrders(
-        request: WhitebitApi.CancelAllOrdersRequest = {},
+        request: WhitebitApi.CancelAllOrdersRequest,
         requestOptions?: SpotTradingClient.RequestOptions,
-    ): core.HttpResponsePromise<void> {
+    ): core.HttpResponsePromise<unknown[]> {
         return core.HttpResponsePromise.fromPromise(this.__cancelAllOrders(request, requestOptions));
     }
 
     private async __cancelAllOrders(
-        request: WhitebitApi.CancelAllOrdersRequest = {},
+        request: WhitebitApi.CancelAllOrdersRequest,
         requestOptions?: SpotTradingClient.RequestOptions,
-    ): Promise<core.WithRawResponse<void>> {
+    ): Promise<core.WithRawResponse<unknown[]>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -2028,7 +2031,7 @@ export class SpotTradingClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: undefined, rawResponse: _response.rawResponse };
+            return { data: _response.body as unknown[], rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -2671,17 +2674,16 @@ export class SpotTradingClient {
      *
      * Supported order types: limit, stop limit, stop market.
      *
-     * Request must contain one of the following parameters: amount, price, activationPrice.
+     * Request must contain at least one of the following parameters: amount, total, price, activationPrice.
      *
      * <Warning>
      * Rate limit: 10000 requests/10 sec.
      * </Warning>
      *
      * <Note>
-     * - Use total parameter instead of amount for modify buy stop market order.
-     * - Modification by clientOrderId takes priority.
-     * - The request supports working only with orderId or only with clientOrderId.
-     * - Do not pass both values at the same time.
+     * - Use total parameter instead of amount for modify buy stop market order. `amount` and `total` are mutually exclusive — a request sending both is rejected.
+     * - The request accepts exactly one identifier: either `orderId` or `clientOrderId`.
+     * - Sending both identifiers, or neither, returns a validation error.
      * </Note>
      *
      * <Note>
@@ -2877,8 +2879,7 @@ export class SpotTradingClient {
      *
      * @example
      *     await client.spotTrading.setKillSwitch({
-     *         market: "BTC_USDT",
-     *         timeout: "60"
+     *         market: "BTC_USDT"
      *     })
      */
     public setKillSwitch(

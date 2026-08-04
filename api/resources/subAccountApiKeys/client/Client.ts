@@ -46,11 +46,13 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.createSubAccountApiKey({
      *         type: 1,
-     *         subAccountId: "8e667b4a-0b71-4988-8af5-9474dbfaeb51"
+     *         subAccountId: "8e667b4a-0b71-4988-8af5-9474dbfaeb51",
+     *         title: "Trading Bot Key"
      *     })
      */
     public createSubAccountApiKey(
@@ -103,6 +105,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,
@@ -135,6 +139,7 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.editSubAccountApiKey({
@@ -199,6 +204,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,
@@ -231,6 +238,7 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.deleteSubAccountApiKey({
@@ -287,6 +295,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,
@@ -413,6 +423,7 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.resetSubAccountApiKey({
@@ -469,6 +480,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,
@@ -501,6 +514,7 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.listSubAccountApiKeyIpAddresses({
@@ -560,6 +574,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,
@@ -592,6 +608,7 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.createSubAccountApiKeyIpAddress({
@@ -652,6 +669,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,
@@ -684,6 +703,7 @@ export class SubAccountApiKeysClient {
      * @param {SubAccountApiKeysClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link WhitebitApi.BadRequestError}
+     * @throws {@link WhitebitApi.NotFoundError}
      *
      * @example
      *     await client.subAccountApiKeys.deleteSubAccountApiKeyIpAddress({
@@ -744,6 +764,8 @@ export class SubAccountApiKeysClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new WhitebitApi.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 404:
+                    throw new WhitebitApi.NotFoundError(_response.error.body as unknown, _response.rawResponse);
                 default:
                     throw new errors.WhitebitApiError({
                         statusCode: _response.error.statusCode,

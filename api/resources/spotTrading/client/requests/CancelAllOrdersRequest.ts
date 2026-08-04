@@ -4,7 +4,9 @@
  * @example
  *     {
  *         market: "BTC_USDT",
- *         type: ["spot", "margin", "futures"]
+ *         type: ["spot", "margin", "futures"],
+ *         request: "{{request}}",
+ *         nonce: 1594297865000
  *     }
  */
 export interface CancelAllOrdersRequest {
@@ -12,8 +14,10 @@ export interface CancelAllOrdersRequest {
     market?: string;
     /** Order types to target. Valid values: "spot" — standard spot orders. "margin" — marginal orders placed on spot markets. Note: the "margin" value is not the same as the collateral account balance; "collateral" in other endpoints refers to the funding account, whereas "margin" here refers specifically to the order type. "futures" — marginal orders placed on futures markets (e.g., BTC_PERP). If omitted, the API targets all order types. */
     type?: CancelAllOrdersRequest.Type.Item[];
-    request?: string;
-    nonce?: number;
+    /** [Position side](/glossary#position-side) scope. Accepted only when `market` is a perpetual futures market (e.g., BTC_PERP); values are lowercase on this endpoint. */
+    positionSide?: CancelAllOrdersRequest.PositionSide;
+    request: string;
+    nonce: number;
 }
 
 export namespace CancelAllOrdersRequest {
@@ -27,4 +31,12 @@ export namespace CancelAllOrdersRequest {
         } as const;
         export type Item = (typeof Item)[keyof typeof Item];
     }
+
+    /** [Position side](/glossary#position-side) scope. Accepted only when `market` is a perpetual futures market (e.g., BTC_PERP); values are lowercase on this endpoint. */
+    export const PositionSide = {
+        Both: "both",
+        Long: "long",
+        Short: "short",
+    } as const;
+    export type PositionSide = (typeof PositionSide)[keyof typeof PositionSide];
 }

@@ -6,10 +6,14 @@ export interface GetMarketFeeResponse {
     taker?: string | undefined;
     /** Maker fee percentage */
     maker?: string | undefined;
-    /** Default effective futures taker fee rate. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
+    /** Default effective futures taker fee percentage. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
     futures_taker?: string | undefined;
-    /** Default effective futures maker fee rate. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
+    /** Default effective futures maker fee percentage. The system returns the lower value between the custom fee (if assigned) and the default market fee. */
     futures_maker?: string | undefined;
+    /** Additional maker fee percentage applied on top of the `maker` rate when a [Retail Price Improvement (RPI)](/glossary#retail-price-improvement-rpi) order executes on a spot or margin market. The effective RPI maker rate equals `maker` plus `rpi_maker_fee_premium`. The field returns `null` when the RPI order mode is not enabled for the account or when no premium is configured. */
+    rpi_maker_fee_premium?: (string | null) | undefined;
+    /** Additional maker fee percentage applied on top of the `futures_maker` rate when a [Retail Price Improvement (RPI)](/glossary#retail-price-improvement-rpi) order executes on a futures market. The effective futures RPI maker rate equals `futures_maker` plus `futures_rpi_maker_fee_premium`. The field returns `null` when the RPI order mode is not enabled for the account or when no premium is configured. */
+    futures_rpi_maker_fee_premium?: (string | null) | undefined;
     /** Per-market fee overrides, keyed by market name. Each value contains the market's custom `taker` and `maker` rates. */
     custom_fee?: Record<string, GetMarketFeeResponse.CustomFee.Value> | undefined;
 }

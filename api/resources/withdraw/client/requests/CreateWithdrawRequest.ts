@@ -24,51 +24,12 @@
  *
  * @example
  *     {
- *         ticker: "UAH",
- *         amount: "100",
- *         address: "0x0964A6B8F794A4B8d61b62652dB27ddC9844FB4c",
- *         uniqueId: "24529043",
- *         provider: "VISAMASTER",
- *         request: "{{request}}",
- *         nonce: 1594297865000
- *     }
- *
- * @example
- *     {
  *         ticker: "USD",
  *         amount: "150.00",
  *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
  *         uniqueId: "ab12cd34-9101-4abc-9def-1234567890ab",
  *         provider: "VISAMASTER",
  *         customerIp: "203.0.113.42",
- *         request: "{{request}}",
- *         nonce: 1594297865000
- *     }
- *
- * @example
- *     {
- *         ticker: "UAH",
- *         amount: "50000",
- *         address: "t6XIpyirkiLP+I++XHWfSeGrn5p38g==",
- *         uniqueId: "24529045",
- *         provider: "VISAMASTER_PAYCORE",
- *         partialEnable: true,
- *         request: "{{request}}",
- *         nonce: 1594297865000
- *     }
- *
- * @example
- *     {
- *         ticker: "UAH",
- *         amount: "50000",
- *         address: "UA213223130000026007233566001",
- *         uniqueId: "24529045",
- *         provider: "UAH_IBAN",
- *         beneficiary: {
- *             firstName: "Firstname",
- *             lastName: "Lastname",
- *             tin: 1000000000
- *         },
  *         request: "{{request}}",
  *         nonce: 1594297865000
  *     }
@@ -235,9 +196,9 @@ export interface CreateWithdrawRequest {
     /**
      * Beneficiary information.
      *
-     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR.
+     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, EUR_VISAMASTER, USD, EUR.
      *
-     * Per-field requirements vary by currency and provider. Card-related fields (`cardToken`, `card.*`, `cardTokenSave`, `fingerprintSession`) apply only to card-acquiring rails; bank-related fields (`bank.*`) apply to bank-rail withdrawals; `tin` is required for UAH_IBAN; `phone`, `email`, and `birthDate` are required for VISAMASTER/Mercuryo rails. See `/asset-status-list` for the active provider per currency.
+     * Per-field requirements vary by currency and provider. Card-related fields (`cardToken`, `card.*`, `cardTokenSave`, `fingerprintSession`) apply only to card-acquiring rails; bank-related fields (`bank.*`) apply to bank-rail withdrawals; `phone`, `email`, and `birthDate` are required for VISAMASTER/Mercuryo rails. See `/asset-status-list` for the active provider per currency.
      */
     beneficiary?: CreateWithdrawRequest.Beneficiary;
     /**
@@ -266,29 +227,23 @@ export namespace CreateWithdrawRequest {
     /**
      * Beneficiary information.
      *
-     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, EUR_VISAMASTER, USD, EUR.
+     * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, EUR_VISAMASTER, USD, EUR.
      *
-     * Per-field requirements vary by currency and provider. Card-related fields (`cardToken`, `card.*`, `cardTokenSave`, `fingerprintSession`) apply only to card-acquiring rails; bank-related fields (`bank.*`) apply to bank-rail withdrawals; `tin` is required for UAH_IBAN; `phone`, `email`, and `birthDate` are required for VISAMASTER/Mercuryo rails. See `/asset-status-list` for the active provider per currency.
+     * Per-field requirements vary by currency and provider. Card-related fields (`cardToken`, `card.*`, `cardTokenSave`, `fingerprintSession`) apply only to card-acquiring rails; bank-related fields (`bank.*`) apply to bank-rail withdrawals; `phone`, `email`, and `birthDate` are required for VISAMASTER/Mercuryo rails. See `/asset-status-list` for the active provider per currency.
      */
     export interface Beneficiary {
         /**
          * Beneficiary first name. Max length: 40 symbols, latin letters and special characters.
          *
-         * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, USD, EUR
+         * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, USD, EUR
          */
         firstName?: string | undefined;
         /**
          * Beneficiary last name. Max length: 40 symbols, latin letters and special characters.
          *
-         * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: UAH_IBAN, USD_VISAMASTER, USD, EUR
+         * ⚠️ Required if currency [ticker](/glossary#ticker) is one of: USD_VISAMASTER, USD, EUR
          */
         lastName?: string | undefined;
-        /**
-         * Beneficiary TAX payer number. Integer, 10 digits.
-         *
-         * ⚠️ Required if currency is UAH_IBAN.
-         */
-        tin?: number | undefined;
         /**
          * Beneficiary phone number.
          *

@@ -13,6 +13,6 @@ export interface GetApiV4PublicOrderbookMarketRequest {
     market: string;
     /** Orders depth quantity: 0 - 100. Not defined or 0 will return 100 entries. */
     limit?: number;
-    /** Aggregation level for price grouping. Level 0 applies no aggregation. Levels 1–5 provide increasing aggregation of the order book. */
+    /** Aggregation level for price grouping. Level 0 applies no aggregation. Levels 1–5 provide increasing aggregation of the order book; values up to 10 are accepted. Out-of-range values are clamped to the 0–10 range rather than rejected. */
     level?: number;
 }

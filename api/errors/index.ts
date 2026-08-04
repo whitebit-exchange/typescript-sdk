@@ -5,4 +5,5 @@ export * from "./NotFoundError.js";
 export * from "./PreconditionFailedError.js";
 export * from "./ServiceUnavailableError.js";
 export * from "./UnauthorizedError.js";
+export * from "./UnavailableForLegalReasonsError.js";
 export * from "./UnprocessableEntityError.js";
